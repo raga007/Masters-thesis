@@ -1,7 +1,27 @@
 % Don't type any content in this file. Put all the text in the chapters folder
 % for modularity.
 
+% setting the graphics path to get images
+\graphicspath{ {chapters/images/} }
+% command for blank page
+\newcommand{\blankpage}{
+\newpage
+\thispagestyle{plain}
+\mbox{}
+\newpage
+}
+\lstset{
+    frame=single,
+    breaklines=true,
+    postbreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\color{black}\hookrightarrow\space}}
+}
+
+% adding chapters from their respective tex files
 \input{chapters/chapter1}
+\blankpage
 \input{chapters/chapter2}
-
-
+\blankpage
+\input{chapters/chapter3}
+\blankpage
+\input{chapters/chapter4}
+\blankpage

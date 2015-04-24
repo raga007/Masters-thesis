@@ -37,6 +37,7 @@
 
 \usepackage[round]{natbib}
 \usepackage{titlesec}
+\usepackage{listings}
 
 
 
@@ -46,9 +47,8 @@
 
 
 
-
-% \mastersthesis                     %% Uncomment one of these; if you don't
-\phdthesis                         %% use either, the default is \phdthesis.
+ \mastersthesis                     %% Uncomment one of these; if you don't
+%\phdthesis                         %% use either, the default is \phdthesis.
 
 % \thesisdraft                       %% Uncomment this if you want a draft
                                      %% version; this will print a timestamp
@@ -74,11 +74,11 @@
 \renewcommand{\thesismonth}{May}     %% Your month of graduation.
 \renewcommand{\thesisyear}{2015}      %% Your year of graduation.
 
-\renewcommand{\thesisauthorpreviousdegrees}{, B.S.} 
+\renewcommand{\thesisauthorpreviousdegrees}{, B.Tech.} 
                                      %% Your previous degrees, abbreviated;
                                      %% separate multiple degrees by commas.
 
-\renewcommand{\thesissupervisor}{Your Advisor}
+\renewcommand{\thesissupervisor}{Sarfraz Khurshid}
                                      %% Your thesis supervisor; use mixed-case
                                      %% and don't use any titles or degrees.
 
@@ -86,9 +86,9 @@
                                      %% Your PhD. thesis co-supervisor; if any.
                                      %% Uncomment if you have a co-supervisor.
 
-\renewcommand{\thesiscommitteemembera}{Committee Member A}
-\renewcommand{\thesiscommitteememberb}{Committee Member B}
-\renewcommand{\thesiscommitteememberc}{Committee Member C}
+\renewcommand{\thesiscommitteemembera}{Razieh Nokhbeh Zaeem}
+%\renewcommand{\thesiscommitteememberb}{Committee Member B}
+%\renewcommand{\thesiscommitteememberc}{Committee Member C}
 % \renewcommand{\thesiscommitteememberd}{}
 % \renewcommand{\thesiscommitteemembere}{}
 % \renewcommand{\thesiscommitteememberf}{}
@@ -104,7 +104,7 @@
 \renewcommand{\thesisauthor}{\myname}
 \renewcommand{\thesistitle}{\mytitle}
 
-\renewcommand{\thesisauthoraddress}{...}
+\renewcommand{\thesisauthoraddress}{No. 1B Sunflower Apts,\\Ceebros Gardens, Virugambakkam,\\Chennai, TN, India}
                                      %% Your permanent address; use "\\" for
                                      %% linebreaks.
 
@@ -125,14 +125,14 @@
                                      %% Replace the "..." with the correct
                                      %% number of members.
 
-% \renewcommand{\thesisdegree}{...}  %% Uncomment this only if your thesis
+\renewcommand{\thesisdegree}{MASTER OF SCIENCE}  %% Uncomment this only if your thesis
                                      %% degree is NOT "DOCTOR OF PHILOSOPHY"
                                      %% for \phdthesis or "MASTER OF ARTS"
                                      %% for \mastersthesis.  Provide the
                                      %% correct FULL OFFICIAL name of
                                      %% the degree.
 
-% \renewcommand{\thesisdegreeabbreviation}{...}
+\renewcommand{\thesisdegreeabbreviation}{M.S.}
                                      %% Use this if you also use the above
                                      %% command; provide the OFFICIAL
                                      %% abbreviation of your thesis degree.
@@ -158,17 +158,17 @@
 
 \thesiscopyrightpage                 %% Generate the copyright page.
 
-\thesiscertificationpage             %% Generate the PhD. certification page.
+%\thesiscertificationpage             %% Generate the PhD. certification page.
 
 \thesistitlepage                     %% Generate the title page.
 
 %\thesissignaturepage                %% Generate the Master's signature page.
 
-%\thesisdedicationpage                %% Generate the dedication page.
+\thesisdedicationpage                %% Generate the dedication page.
 
-% \begin{thesisacknowledgments}        %% Use this to write your
-%                                   %% acknowledgments; it can be anything
-% \end{thesisacknowledgments}          %% allowed in LaTeX2e par-mode.
+\begin{thesisacknowledgments}        %% Use this to write your
+                                   %% acknowledgments; it can be anything
+\end{thesisacknowledgments}          %% allowed in LaTeX2e par-mode.
 
 
 \begin{thesisabstract}               %% Use this to write your thesis abstract; it can be anything allowed in LaTeX2e par-mode.
@@ -177,9 +177,9 @@
 \end{thesisabstract}
 
 \tableofcontents                     %% Generate table of contents.
-% \listoftables                      %% Uncomment this to generate list
-                                     %% of tables.
-% \listoffigures                     %% Uncomment this to generate list
+\listoftables                      %% Uncomment this to generate list
+                                    %% of tables.
+\listoffigures                     %% Uncomment this to generate list
                                      %% of figures.
 
 
