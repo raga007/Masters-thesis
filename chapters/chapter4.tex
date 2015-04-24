@@ -151,7 +151,6 @@ boolean repOKMultipleVariables() {
     // checks that the size is consistent.
     return acyclic && sizeOk && (visited.size() == size);  
 }
-}
 \end{lstlisting}
 \caption{RepOk that uses multiple boolean variables to decide its result. It violates C5 and C6 and ends up affecting the efficiency of Korat.}
 \label{fig:repOkMultipleBooleanVariables}
