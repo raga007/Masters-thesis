@@ -1,6 +1,46 @@
 \chapter{Introduction}
-Need to write introduction.
+Testing plays a vital role in developing reliable systems. However, testing manually is expensive and tedious. Researchers have long recognized the benefits of using specifications in automated testing~\cite{...}. While the initial use of specifications was largely in academic settings, the last fifteen years have seen much progress in developing tools that can make use of specifications to test real applications, e.g., by generating test inputs automatically using constraint solving \cite{demilli1991constraint,gotlieb1998automatic,howden1977symbolic,huang1975approach,king1976symbolic,korel1996automated,legeard2002automated,marinov2001testera}.
 
-%\section{Usage of reflection for field access}
+\medskip
+\para
+The focus of our work is test input generation using imperative predicates, which was introduced by the \emph{Korat} approach \cite{boyapati2002korat}. Korat takes a given Java method, called \emph{repOk}, that returns a \emph{boolean} method, and systematically explores the input space of the predicate to enumerate inputs for which \emph{repOk} returns \emph{true}. The focus of Korat’s generation is structurally complex data, e.g., recursive data structures allocated on the program heap. The input spaces to explore for such recursive structures are often huge.  Korat performs a bounded exploration defined by a \emph{finitization} given by the user to bound the input size. Korat efficiently prunes the space of candidate inputs for the \emph{repOk} method by executing it on candidate inputs and monitoring the object fields that \emph{repOk} accesses in deciding if the properties are satisfied. Moreover, Korat prunes from search candidates that are isomorphic to any candidate already evaluated, thereby further reducing the number of candidates to consider by a considerable factor.
+
+\para
+While Korat generates inputs effectively, its correctness and efficiency rely on two assumptions about the \emph{repOk} methods.  For correctness, Korat assumes the \emph{repOk} methods do not use the Java reflection API for field accesses; the use of reflection renders Korat unable to enumerate all desired inputs.  For efficiency, Korat assumes the \emph{repOk} methods are written such that they only access fields that are necessary to check the properties; the use of unnecessary field accesses by \emph{repOk} renders Korat's pruning ineffective.
+
+\para
+In this thesis, we address both these limitations.  To support reflection, we build on the core Korat to enhance it such that it can monitor field accesses based on reflection.  To deal with unnecessary field accesses, we present a tool called \emph{RepOkValidator} that points out these field accesses so that the user can choose to fix them to makes sure Korat’s efficiency remains unaffected. 
 
 
+\section{Korat : A solver for imperative predicates}
+A \emph{constraint} is a formula that specifies some property of a set of variables. For example, the constraint \emph{x \textgreater 0 \&\& x \textless 10}, specifies that the value of \emph{x} needs to be between zero and ten. Constraint solving amounts to finding solutions to constraints, i.e assignments to variables that make the constraint formula true. For example, \emph{x = 5} is a solution for the above constraint formula. The main idea is to represent the property of the desired test inputs as a constraint such that the solution to the constraint translates to a test input. Though there have been other approaches that focussed on constraints where variables are integers or arrays of integers \cite{demilli1991constraint,huang1975approach,king1976symbolic,korel1996automated}. Korat \cite{boyapati2002korat} is the first tool that solved constraints for structurally complex inputs.
+
+\para
+Korat understands constraints as imperative predicates written by the user. An \emph{imperative predicate} is a piece of code that takes an input structure and determines its validity. Solving an imperative predicate amounts to finding structures for which the predicate returns \emph{true}; Korat calls these structures valid structures. Imperative predicates give the user an operational way of expressing declarative constraints that identify the desired test inputs. The user provides an imperative predicate, written in Java, that returns true if the input structure satisfies the required property and \emph{false} otherwise. Every valid structure translates into a test input.
+
+\para
+Korat takes as an input; a java \emph{predicate} and a \emph{finitization} that bounds the size of the input structures and produces all valid \emph{nonisomorphic} structures within the given bounds as an output. A finitization specifies bounds for the number of objects in a structure and the possible values for the fields of these objects. Korat generates all valid structures by systematically searching the structure space defined by the finitization. Korat prunes the search space by monitoring the execution of the predicate and determining the fields of the structure accessed by the predicate before it returns the result. The efficiency of the pruning depends not only on the set of valid structures (usually very small compared to the size of the structure space) but also on the way the imperative predicate is written. An ill-written predicate might always read all the fields of a structure before returning the result, thereby forcing Korat to explore almost the entire structure space. In chapter 2, we will see an example of this behavior.
+
+
+\section{Reflection and its importance}
+\noindent Formally, reflection can be split into three main aspects \cite{bracha2004mirrors,mostinckx2009mirror}:
+\begin{itemize}
+\item \emph{Introspection}: the ability of a program to examine itself.
+\item \emph{Self-modification}: the ability of a program to alter its structure.
+\item \emph{Intercession}: the ability of a program to alter its behaviour.
+\end{itemize}
+
+\para
+Unfettered run-time modification of a system is dangerous, since it can have subtle, unintended consequences. However careful use of reflection allows programmers to bend a language to their particular circumstances rather than the other way round. Most dynamically typed languages are capable of introspection; many are capable of self-modification; relatively few are capable of intercession. Korat is primarily written in Java which is a statically typed language that only supports the introspective \cite{maes1987concepts} aspects of reflection.Java Reflection makes it possible to inspect classes, interfaces, fields and methods at runtime, without knowing the names of the classes, methods etc. at compile time. It is also possible to instantiate new objects, invoke methods and \emph{get/set} field values using reflection.
+
+\para
+Korat monitors the field accesses made by the imperative predicate written by the user and prunes the search space accordingly. Since java supports field access using reflection, it is important to make sure that Korat also monitors field accesses using reflection. This property will become more useful when Korat is implemented in a dynamically typed language like ruby/python. 
+
+\section{Static Analysis}
+Static program analysis is the analysis of a piece of code without actually executing the piece of code. The sophistication of the analysis performed by different tools varies from those that only consider the behavior of individual statements and declarations, to those that include the complete source code of a program in their analysis. Since a badly written predicate can deteriorate the efficiency of Korat, a static analysis of the predicate can point out places (if any) where the predicate can be improved. Chapter 4 presents \emph{RepOkValidator}, a tool that  uses \emph{def-use} analysis to check if the predicate written by the user affects the efficiency of Korat.
+
+\para
+A def-use analysis is a data-flow analysis which helps in statically accumulating def-use and use-def chains. A use-definition chain is a data structure that consists of a use, U, of a variable, and all the definitions, D, of that variable that can reach that use without any other intervening definitions. Once the RepOkValidator has access to the use-def chain of the predicate, it checks the chain to see if a few properties (mentioned in chapter 4) that affect Korat’s efficiency are not violated.
+
+\section{Organization}
+The remainder of this thesis is organized as follows. Chapter 2 illustrates with examples, scenarios where Korat underperforms. Chapter 3 talks about adding reflection to Korat. Chapter 4 presents a static analysis tool that can be used to validate a predicate written by the user. Chapter 5 presents a small library that can be used for code reuse in predicates. Chapter 6 compares usage of predicates that use reflection and a predicate that does not use reflection, with Korat and shows how Korat performs when reflection is not supported. Chapter 7 discusses other approaches that people have used to improve Korat and also suggests some future work.
