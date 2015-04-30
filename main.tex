@@ -21,6 +21,17 @@
 \medskip
 \par
 }
+% Quote the author
+\def\signed #1{{\leavevmode\unskip\nobreak\hfil\penalty50\hskip2em
+  \hbox{}\nobreak\hfil(#1)%
+  \parfillskip=0pt \finalhyphendemerits=0 \endgraf}}
+
+\newsavebox\mybox
+\newenvironment{aquote}[1]
+  {\savebox\mybox{#1}\begin{quote}}
+  {\signed{\usebox\mybox}\end{quote}}
+
+%block comment
 
 % adding chapters from their respective tex files
 \input{chapters/chapter1}
@@ -29,4 +40,5 @@
 \input{chapters/chapter4}
 \input{chapters/chapter5}
 \input{chapters/chapter6}
-
+\input{chapters/chapter7}
+\input{chapters/chapter8}

@@ -1,0 +1,17 @@
+\chapter{Conclusion and Future work}
+yet to write this chapter.
+
+\section{Future work}
+
+Korat requires the user to provide an imperative predicate. In java an imperative predicate is a method is a method that takes an input structure and returns a \emph{boolean}. Aditionally, the user provides a finitization that bounds the number of objects in the structure and the values for the fields of those objects. Korat then generates all nonisomorphic structures, within the bounds for which the predicate returns true. The structures that Korat generates form a basis for bounded exhaustive testing. We next present several ideas for extending the work on Improvised Korat.
+
+\para
+\textbf{Language Independant Korat} : Korat is completely written in java which is a widely used statically typed language. It would be interesting to see Korat work with other statically and dynamically typed languages where the instrumentation is the only thing that is language specific. It is important to find the right trade-off between the ease of writing the predicate and the efficiency of generation. This can be guarenteed by making use of a language independant static analysis that checks for violations of conditions specified in chapter 4.
+
+\para
+\textbf{Context based test generation} : Korat by default generates all non-isomorhic structures upto a given bound provided by the finitization provided by the user. An obvious approach to reduce the number of structures is to consider non-exhaustive generation based on the context. This will help make Korat both quicker and more intelligent. For example, if the application under test is going to be a web application, Korat can choose to generate only boundary tests (tests that can make the system break, in general), as opposed to generating all functionality tests.
+
+\para
+\textbf{Build system with Korat} : //Integerate Korat with continuous integeration.
+
+

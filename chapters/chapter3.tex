@@ -54,23 +54,28 @@ class BinaryTree {
 
 
 \section{Adding reflection to Instrumentation}
-Korat fails to monitor field accesses that use reflection. In order to make sure field accesses that use reflection are monitored by Korat, the instrumentation needs to make sure it accounts for reflection. Figure 3-2 shows all the methods in the java.reflect.Field class that can used to access a field using the java reflection API. The figure does not show methods that can be used to set the value of field using reflection but, it should be straightforward to find the counterparts of the getter methods from the documentation. The Korat instrumentation needs to look for invocation of these methods in the predicate written by the user and replace them with the getFieldValue method from the ReflectionUtils class as shown in figure 3-2. We haven’t modified the implementation of Korat instrumentation to account for reflection based field access. All experiments were done by manually using the getFieldValue method in place of the methods from the Field class.
+Korat fails to monitor field accesses that use reflection. In order to make sure field accesses that use reflection are monitored by Korat, the instrumentation needs to make sure it accounts for reflection. Figure 3-2 shows all the methods in the java.reflect.Field class that can used to access a field using the java reflection API. The figure does not show methods that can be used to set the value of field using reflection but, it should be straightforward to find the counterparts of the getter methods from the documentation. The Korat instrumentation needs to look for invocation of these methods in the predicate written by the user and replace them with the getFieldValue method from the ReflectionUtils class as shown in figure 3-2. The getFieldValue method adds the field access to the accessed fields list maintained by Korat and hence Korat can now account for field accesses that use reflection. We haven’t modified the implementation of Korat instrumentation to replace the java reflection API calls with getFieldValue method calls. All experiments were done by manually using the getFieldValue method in place of the methods from the Field class.
 
 \begin{figure}
 \centering
 \begin{lstlisting}[language=Java]
-Object ReflectionUtils.getFieldValue(Object obj, String fieldName)
+//method call that makes Korat account for field access
+Object obj = ReflectionUtils.getFieldValue(Object obj, Field field);
 
-Object get(Object obj)
-boolean getBoolean(Object obj)
-byte getByte(Object obj)
-char getChar(Object obj)
-double getDouble(Object obj)
-float getFloat(Object obj)
-int getInt(Object obj)
-long getLong(Object obj)
-short getShort(Object obj)
+//different ways to access a field using Java Reflection API
+Field field = BinaryTree.class.getDeclaredField(``left'');
+Object obj = field.get(Object obj);
+boolean obj = field.getBoolean(Object obj)
+byte obj = field.getByte(Object obj)
+char obj = field.getChar(Object obj)
+double obj = field.getDouble(Object obj)
+float obj = field.getFloat(Object obj)
+int obj = field.getInt(Object obj)
+long obj = field.getLong(Object obj)
+short obj = field.getShort(Object obj)
 
+// Instrumentation replaces the java reflection API call with our API call
+field.get(obj) -> ReflectionUtils.getFieldValue(obj,field);
 \end{lstlisting}
 \caption{Methods of the field class that the instrumentation needs to replace with the getFieldValue method.}
 \label{fig:fieldClassInstrumentationMethods}
@@ -106,8 +111,7 @@ boolean repOK() {
         }
     }
     // Korat’s search is not affected by the following access.
-    if(visited.size() != (int)ReflectionUtils
-             .unaccountedAccess(this,”size”)){
+    if(visited.size() != (int)ReflectionUtils.unaccountedAccess(this,”size”)){
         System.out.println(“Size mismatch, need to change size”);
     }
     // checks that the size is consistent.
