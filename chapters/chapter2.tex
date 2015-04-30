@@ -1,9 +1,10 @@
 \chapter{Shortcomings of Korat}
+\label{ch:shortcomings-of-korat}
 This chapter presents two scenarios where Korat\cite{boyapati2002korat} fails to generate the \emph{best} possible results it is capable of producing with its algorithm. The first example shows how Korat malfunctions by terminating before exploring all the states when reflection is used in the predicate written by the programmer. The second example shows how korat explores more states than required when the predicate written by the programmer doesn’t return the result as soon as possible. Both examples use a binary tree data structure to illustrate a predicate method that validates a linked data structure. The shortcomings observed in both the examples will also apply for an array-based data structure, like a heap.
 
 \section{Usage of reflection for field access}
+\label{sec:usage-of-reflection-for-field-access}
 In this example, we use two different ways of field access using reflection to illustrate both the ways a programmer can use reflection to access a field. Figure \ref{fig:btreeDirectRepOk} shows the java code for a binary tree implementation. Each object of the class \emph{BinaryTree} represents a binary tree. The value of the \emph{size} field is the number of nodes in the tree. Objects in the inner class \emph{Node} represent nodes of the tree. To use Korat, the programmer needs to provide an imperative predicate that checks the validity of inputs. It is called \emph{repOk} and it typically checks the representation invariant or class invariant of the corresponding data structure. \\
-
 
 \begin{figure}
 \centering
@@ -147,6 +148,7 @@ This proves that Korat’s algorithm is drastically affected even if a single fi
 
 
 \section{Inefficient predicates}
+\label{sec:inefficient-predicates}
 Korat claims to efficiently generate all valid non-isomorphic structures even for large state spaces. The search pruning that Korat performs allows Korat to explore only a tiny part of the state space. The ratio of the number of candidate structures considered and the size of the state space shows that the key to effective pruning is backtracking based on fields accessed during predicate execution. Korat usually performs extremely well when the user written predicate returns a \emph{true/false} as soon as it knows the result. Figure \ref{fig:btreeDirectRepOk} shows a \emph{repOk} of a \emph{BinaryTree} that checks for three violations that can render a candidate as an invalid binary tree. The \emph{repOk} returns \emph{false} as soon as it knows that the candidate has violated one of the three rules for a graph to be a binary tree.
 
 \begin{figure}
