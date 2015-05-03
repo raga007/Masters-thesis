@@ -1,14 +1,40 @@
 \chapter{Library for predicates}
 \label{ch:library-for-predicates}
-This chapter introduces a library that can be used by the programmer to write efficient predicates for Korat. Section \ref{sec:library-for-predicates-example} shows an example of using a method from the library that checks for acyclicity in a recursive data structure. The library presented in this chapter (\emph{korat.util.ReflectionLib}) currently has two methods :
+This chapter presents a library that can be used by the programmer
+to write short and efficient predicates for Korat. Section
+\ref{sec:library-for-predicates-example} shows an example of using a
+method from the library that checks for acyclicity in a recursive data
+structure. The library presented in this chapter
+(\emph{korat.util.ReflectionLib}) currently has two methods :
 \begin{itemize}
-\item \emph{Set checkAcyclicity(Object o)} : checks if the given object is acyclic. It is assumed that this method is used when writing predicates for recursive data structures like BinaryTree. This method returns a \emph{java.util.HashSet} of the recursive objects if the \emph{Object o} is acyclic else, it returns a \emph{null}.
-\item \emph{String serializeStructure(Object o)} : serializes the Object recursively, without accounting for the field accesses. Different levels in the provided object are represented with trailing \emph{tabs}. This method returns a \emph{String} that represents the serialized form of the \emph{Object o}.
+\item \emph{Set checkAcyclicity(Object o)} : checks if the given
+  object graph is acyclic. This method returns a
+  \emph{java.util.HashSet} of the recursive objects if the
+  \emph{Object o} is acyclic else, it returns a \emph{null}.
+\item \emph{String serializeStructure(Object o)} : serializes the
+  Object recursively, without accounting for the field
+  accesses. Different levels in the provided object are represented
+  with trailing \emph{tabs}. This method returns a \emph{String} that
+  represents the serialized form of the \emph{Object o}.
 \end{itemize}
 
 \section{Example}
 \label{sec:library-for-predicates-example}
-Figure \ref{fig:btreeLibraryRepOk} shows an example of how a user can use a library call to both reduce the size of \emph{repOk} and make sure that the \emph{repOk} is efficient. The methods provided in the library are written in such a way that they don't affect Korat's efficiency when used. In other words, they don't violate conditions C1-C6 shown in chapter 4. In figure \ref{fig:btreeLibraryRepOk}, we use the \emph{checkAcyclicity} method to check the acyclicity property of BinaryTree data structure introduced in chapter \ref{ch:shortcomings-of-korat}. It is important to note that the \emph{repOk} shown in figure \ref{fig:btreeLibraryRepOk} has the same effect as the \emph{repOk} shown in figure \ref{fig:btreeDirectRepOk} which is the most efficient version of a \emph{repOk} that can be written for the BinaryTree data structure. Using the \emph{checkAcyclicity} method, the user can avoid code bloat, as well as condition violations.
+Figure \ref{fig:btreeLibraryRepOk} shows an example of how a user can
+use a library call to both reduce the size of \emph{RepOk} and make
+sure that the \emph{RepOk} is efficient. The methods provided in the
+library are written in such a way that they don't make unnecessary
+field acesses that affect Korat's efficiency. In other words, they
+don't violate conditions C1-C6 shown in chapter
+\ref{ch:static-analysis}. In figure \ref{fig:btreeLibraryRepOk}, we
+use the \emph{checkAcyclicity} method to check the acyclicity property
+of our BinaryTree data structure introduced in chapter
+\ref{ch:shortcomings-of-korat}. It is important to note that the
+\emph{RepOk} implementation shown in figure
+\ref{fig:btreeLibraryRepOk} has the same functionality as the
+\emph{RepOk} implentation shown in figure \ref{fig:btreeDirectRepOk}
+which is the most efficient version of a \emph{repOk} that can be
+written for our BinaryTree data structure.
 
 \begin{figure}
 \centering

@@ -1,10 +1,40 @@
-\chapter{Shortcomings of Korat}
+\chapter{Two shortcomings of Korat}
 \label{ch:shortcomings-of-korat}
-This chapter presents two scenarios where Korat\cite{boyapati2002korat} fails to generate the \emph{best} possible results it is capable of producing with its algorithm. The first example shows how Korat malfunctions by terminating before exploring all the states when reflection is used in the predicate written by the programmer. The second example shows how korat explores more states than required when the predicate written by the programmer doesn’t return the result as soon as possible. Both examples use a binary tree data structure to illustrate a predicate method that validates a linked data structure. The shortcomings observed in both the examples will also apply for an array-based data structure, like a heap.
+This chapter presents two scenarios where
+Korat fails to perform as expected.  The first
+example shows how the use of reflection for field accesses may render
+Korat unable to generate some valid structures.  The second example
+shows how a poorly-written RepOk may adversely affect the performance
+of Korat and force it to explore many more states than necessary.
+Both examples use a binary tree data structure and implement different
+RepOk methods that check the same set of properties but operate
+differently.  We compare the performance of Korat by using these RepOk
+methods against using the standard binary tree RepOk from Korat
+distribution.  Chapter \ref{ch:evaluation} provides experimental
+results using additional data structures.
 
 \section{Usage of reflection for field access}
 \label{sec:usage-of-reflection-for-field-access}
-In this example, we use two different ways of field access using reflection to illustrate both the ways a programmer can use reflection to access a field. Figure \ref{fig:btreeDirectRepOk} shows the java code for a binary tree implementation. Each object of the class \emph{BinaryTree} represents a binary tree. The value of the \emph{size} field is the number of nodes in the tree. Objects in the inner class \emph{Node} represent nodes of the tree. To use Korat, the programmer needs to provide an imperative predicate that checks the validity of inputs. It is called \emph{repOk} and it typically checks the representation invariant or class invariant of the corresponding data structure. \\
+This example first illustrates how a RepOk method can be written with
+and without using reflection for field accesses and then shows how the
+output of Korat differs in terms of the sets of valid structures
+generated.
+
+\para
+Figure \ref{fig:btreeDirectRepOk} shows the Java declaration of a
+binary tree and a standard implementation of its RepOk
+method\footnote{\url{korat.sourceforge.net}}. Each object of the class
+\emph{BinaryTree} represents a binary tree. The value of the
+\emph{size} field is the number of nodes in the tree. Objects of the
+inner class \emph{Node} represent nodes of the tree.  The RepOk method
+performs a traversal of its input object graph and checks that it has
+no cycle and the value of the size field is correctly set to the
+actual number of nodes reachable from root.  In more detail, first,
+\emph{RepOk} checks if the tree is empty. If not, \emph{RepOk} checks
+that there are no undirected cycles in the object graph reachable from
+the \emph{root} field along the \emph{left} and \emph{right}
+fields. It finally checks that the number of nodes reachable from the
+root is the same as the value of field \emph{size}.
 
 \begin{figure}
 \centering
@@ -17,7 +47,7 @@ class BinaryTree {
         Node right;    // right child
     }
 
-    boolean repOK() {
+    boolean RepOk() {
         // checks that empty tree has size zero.
         if (root == null) return size == 0;
         Set visited = new HashSet();
@@ -43,15 +73,24 @@ class BinaryTree {
     }
 }
 \end{lstlisting}
-\caption{Binary tree example with repOk using direct field access.}
+\caption{Binary tree example with RepOk using direct field access.}
 \label{fig:btreeDirectRepOk}
 \end{figure}
 
 \para
-Figure \ref{fig:btreeDirectRepOk} also shows the \emph{repOk} method that uses direct field access for \emph{BinaryTree}; \emph{repOk} is a predicate that checks the input is indeed a valid binary tree with the correct size. First, \emph{repOk} checks if the tree is empty. If not, \emph{repOk} checks that there are no undirected cycles in the object graph reachable from the \emph{root} field along the \emph{left} and \emph{right} fields. It finally checks that the number of nodes reachable from the root is the same as the value of field \emph{size}. The programmer can use Korat to generate valid test inputs for any method that requires a \emph{BinaryTree} instance as an input. Each binary tree generated will satisfy the \emph{repOk}. To limit the number of inputs, the programmer provides Korat with a finitization that specifies bounds on the number of objects in the data structures and on the values in the fields of these objects. For trees, the finitization specifies the maximum number of nodes and the possible elements. A tree is considered to be in scope n, if it has at most n nodes and n elements. We can use integers from \emph{1 to n} for the \emph{size} field inside the \emph{BinaryTree} class.
+Recall, to bound the number of structures generated by Korat, the
+programmer provides a finitization that specifies bounds on the number
+of objects for different types in the data structures and on the
+values in the fields of these objects.  For our binary tree example,
+the finitization specifies the maximum number of nodes.  A tree is
+considered to be in \emph{scope} $n$, if it has at most $n$ nodes. We
+can use integers from 0 to $n$ for the \emph{size} field inside the
+\emph{BinaryTree} class.
 
-\para
-Given a finitization and a value for scope, Korat generates all non-isomorphic structures that can be formed for a given data structure. In our example, two binary trees are isomorphic if they have the same underlying graph and the elements, irrespective of the identity of the actual nodes in the trees. 
+\para Recall also, given a finitization and a value for scope, Korat
+generates all non-isomorphic structures that exist for the scope.  In
+our example, two binary trees are isomorphic if a permutation of nodes
+exists such that it maps each binary tree to the other.
 
 \begin{figure}
 \centering
@@ -60,11 +99,37 @@ Given a finitization and a value for scope, Korat generates all non-isomorphic s
 \label{fig:btreeKoratGenScopeThree}
 \end{figure}
 
-\para
-When using the \emph{repOk} shown in Figure \ref{fig:btreeDirectRepOk} with a scope of three, Korat generates 90 non-isomorphic candidate structures of which 9 structures end up being valid as they pass the \emph{repOk}. Figure \ref{fig:btreeKoratGenScopeThree} shows the trees that Korat generates for scope three. Each tree consists of one \emph{BinaryTree} object S0 and upto three \emph{Node} objects (N0, N1, N2). For each object, the value and the identity of primitive fields and \emph{Node} objects is shown. Edges represent the values of reference fields with no edge for \emph{null}.
+\para When using the \emph{RepOk} shown in Figure
+\ref{fig:btreeDirectRepOk} with a scope of three, the Korat search
+evaluates 90 non-isomorphic candidate structures and outputs 9
+structures, which are valid since they satisfy the \emph{RepOk}.
+Figure \ref{fig:btreeKoratGenScopeThree} shows the trees that Korat
+generates for scope three. Each tree consists of one \emph{BinaryTree}
+object $S_0$ and upto three \emph{Node} objects ($N_0$, $N_1$,
+$N_2$). For each object, the value and the identity of the \emph{Node}
+objects is shown. Edges represent the values of reference fields with
+no edge for \emph{null}.
 
-\para
-To enable efficient search for valid structures, Korat encodes each structure with a state, and each finitization bounds the state space. Korat uses backtracking to systematically search this state space to find all valid structures. Based on a finitization for the input structures of the predicate, Korat first initializes the state space of structures. Korat then builds candidate structures and executes the predicate on them to check their validity. Korat monitors these executions to dynamically determine which parts of the candidate the result of the predicate depends on. More specifically, Korat monitors the fields of the candidates the execution accesses. If the predicate returns \emph{true}, Korat outputs the candidate as a valid structure for testing. Otherwise, if the predicate returns false or an exception is thrown in the middle of execution, Korat skips the candidate. Korat then backtracks on the values of the accessed fields, to generate the next candidate. Finally, Korat terminates when it explores the entire search space. 
+%................................................................
+
+\para To enable efficient search for valid structures, Korat encodes
+each structure with a state, and each finitization bounds the state
+space. Korat uses backtracking to systematically search this state
+space to find all valid structures. Based on a finitization for the
+input structures of the predicate, Korat first initializes the state
+space of structures. Korat then builds candidate structures and
+executes the predicate on them to check their validity. Korat monitors
+these executions to dynamically determine which parts of the candidate
+the result of the predicate depends on. More specifically, Korat
+monitors the fields of the candidates the execution accesses. Korat
+monitors field accesses by replacing field accesses with accessor
+methods. If the predicate returns \emph{true}, Korat outputs the
+candidate as a valid structure for testing. Otherwise, if the
+predicate returns false or an exception is thrown in the middle of
+execution, Korat skips the candidate. Korat then backtracks on the
+values of the accessed fields, to generate the next
+candidate. Finally, Korat terminates when it explores the entire
+search space.
 
 \begin{figure}
 \centering
@@ -98,18 +163,38 @@ boolean repOK() {
 \label{fig:btTreeReflectionRepOK}
 \end{figure}
 
-\para
-Korat monitors field accesses by replacing direct field accesses with accessor methods that make note of the access and hence affect the way Korat generates candidates. Figure \ref{fig:btTreeReflectionRepOK} and figure \ref{fig:btTreeUserReflectionRepOK} show repOKs that use reflection to access fields in the \emph{BinaryTree} class.
 
 \begin{figure}
 \centering
 \includegraphics[width=11cm,height=6cm,keepaspectratio]{korat_instances_reflection_binary_tree_size_3}
-\caption{ Binary trees that Korat generates for scope three when repOk uses reflection.}
+\caption{ Binary trees that Korat generates for scope three when RepOk uses reflection.}
 \label{fig:btreeReflectKoratGenScopeThree}
 \end{figure}
 
-\para
-The main difference between the \emph{repOk} that uses direct access (shown in figure \ref{fig:btreeDirectRepOk}) and the \emph{repOk} that uses the java reflection API (shown in figure \ref{fig:btTreeReflectionRepOK}) is the access of just one field.The latter \emph{repOk} accesses the \emph{left} child of every \emph{Node} object using the java reflection API instead of direct field access. Since Korat is capable of monitoring only direct field accesses, it doesn’t account for this field access. This ends up affecting the generation of candidates and produces fewer trees than the direct access \emph{repOK}, for the same scope. Figure \ref{fig:btreeReflectKoratGenScopeThree} shows the binary tree structures generated when the repOk in figure \ref{fig:btTreeReflectionRepOK} is used to validate the binary tree candidates that Korat explores. Korat generates only 28 non-isomorphic candidate structures of which 5 structures end up being valid as they pass the repOk.
+\para The main difference between the \emph{RepOk} implementation
+shown in figure \ref{fig:btreeDirectRepOk} and the \emph{RepOk}
+implementation shown in figure \ref{fig:btTreeReflectionRepOK}) is the
+access of just one field. The latter \emph{RepOk} uses the Java
+reflection API to access the \emph{left} child of the \emph{Node}
+object.  Recall, the use of reflection for field accesses may render
+Korat unable to generate some valid structures. Figure
+\ref{fig:btreeReflectKoratGenScopeThree} shows the binary tree
+structures generated when the RepOk implementation in figure
+\ref{fig:btTreeReflectionRepOK} is used to validate the binary tree
+candidates that Korat explores. Korat evaluates only 28 non-isomorphic
+candidate structures of which 5 structures are output, which are valid
+since they satisfy the \emph{RepOk}.
+
+
+\para Figure \ref{fig:btTreeUserReflectionRepOK} shows another version
+of \emph{RepOk} implementation that uses a user written method, which
+inturn uses the Java reflection API to access the \emph{left} field of
+the \emph{Node}. Though Korat instruments all methods invoked in the
+\emph{RepOk}, it will still not be able to monitor accesses that use
+reflection even inside another method. Using this version of
+\emph{RepOk} implementation to generate binary tree inputs also
+produces the same trees shown in figure
+\ref{fig:btreeReflectKoratGenScopeThree}.
 
 \begin{figure}
 \centering
@@ -143,13 +228,36 @@ boolean repOK() {
 \label{fig:btTreeUserReflectionRepOK}
 \end{figure}
 
-\para
-This proves that Korat’s algorithm is drastically affected even if a single field access is done using reflection. To make sure Korat functions as expected and continues to remain complete, it is essential to account for field accesses that use reflection, including direct field accesses. Figure \ref{fig:btTreeUserReflectionRepOK} shows another version of \emph{repOk} that uses a user written method to access the \emph{left} field of every \emph{Node} object. It is assumed that this method uses java reflection API within the method body. Using this version of \emph{repOk} to generate binary tree inputs also produces the same trees shown in figure \ref{fig:btreeReflectKoratGenScopeThree} as Korat is capable of monitoring only direct field accesses. 
-
 
 \section{Inefficient predicates}
 \label{sec:inefficient-predicates}
-Korat claims to efficiently generate all valid non-isomorphic structures even for large state spaces. The search pruning that Korat performs allows Korat to explore only a tiny part of the state space. The ratio of the number of candidate structures considered and the size of the state space shows that the key to effective pruning is backtracking based on fields accessed during predicate execution. Korat usually performs extremely well when the user written predicate returns a \emph{true/false} as soon as it knows the result. Figure \ref{fig:btreeDirectRepOk} shows a \emph{repOk} of a \emph{BinaryTree} that checks for three violations that can render a candidate as an invalid binary tree. The \emph{repOk} returns \emph{false} as soon as it knows that the candidate has violated one of the three rules for a graph to be a binary tree.
+Korat efficiently generates all valid non-isomorphic structures even
+for large state spaces. The search pruning that Korat performs allows
+Korat to explore only a tiny part of the state space. The ratio of the
+number of candidate structures evaluated in Korat, to the size of the
+state space shows that the key to effective pruning is backtracking
+based on fields accessed during predicate execution. Korat performs
+efficiently when the user written predicate returns a
+\emph{true/false} as soon as it knows the result. Figure
+\ref{fig:btreeDirectRepOk} shows a \emph{RepOk} implementation for a
+\emph{BinaryTree} returns \emph{false} as soon as it knows that the
+candidate has violated one of the three rules for a candidate struture
+to be a binary tree.
+
+\para When using the \emph{RepOk} implementation shown in Figure
+\ref{fig:btreeDirectRepOk} with a scope of three, Korat evaluates 90
+non-isomorphic candidate structures of which 9 structures are
+output. The \emph{RepOk} implementation shown in figure
+\ref{fig:bTreeInefficient} has the same functionality and also
+generates the same valid structures as the \emph{RepOk} implementation
+in figure \ref{fig:btreeDirectRepOk} but, it evaluates 893 candidate
+structures for scope three which is an order of magnitude more than
+the number of candidate structures evaluated by the \emph{RepOk}
+implementation in figure \ref{fig:btreeDirectRepOk}. For a larger
+scope, we may observe an increase by multiple orders of magnitude. Thus, the
+\emph{RepOk} implementation in figure \ref{fig:bTreeInefficient} is
+inefficient as it does not return \emph{true/false} right after it
+knows the result and therefore makes excessive field accesses.
 
 \begin{figure}
 \centering
@@ -186,6 +294,3 @@ boolean repOK() {
 \caption{RepOk that doesn’t return the result as soon as it knows it.}
 \label{fig:bTreeInefficient}
 \end{figure}
-
-\para
-When using the \emph{repOk} shown in Figure \ref{fig:btreeDirectRepOk} with a scope of three, Korat generates 90 non-isomorphic candidate structures of which 9 structures end up being valid. The \emph{repOk} shown in figure \ref{fig:bTreeInefficient} has the exact same functionality and also generates the same valid structures as the \emph{repOk} in figure \ref{fig:btreeDirectRepOk} but, it ends up generating 893 candidate structures for scope three which is an order of magnitude more than the number of candidate structures generated by the \emph{repOk} in figure \ref{fig:btreeDirectRepOk}. For a larger scope, we can observe an increase by multiple orders of magnitude. The \emph{repOk} in figure \ref{fig:bTreeInefficient} ends up being an inefficient predicate for generation as it does not return \emph{true/false} right after it knows the result. This is one of the reasons why Korat doesn’t make any promises about its efficiency as it is partly dependant on the predicate written by the user. Though this is not a shortcoming of Korat, it is one of the situations where the effectiveness of Korat is nullified.
