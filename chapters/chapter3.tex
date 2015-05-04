@@ -15,14 +15,16 @@ structures.
 introduce the technique used by Korat to monitor field accesses. In
 section \ref{sec:adding-reflection-to-instrumentation} we discuss a
 technique to build on Korat's instrumentation to monitor field
-accesses that use the Java reflection API. Finally, in section
+accesses that use the Java reflection API. In section
 \ref{ch:unaccounted-field-accesses} we present a method that can be
 used to make a feild access that doesn't affect Korat's search
 algorithm. We call it an \emph{unaccounted field access} and it is
 useful when the field access is used for something that does not
 affect the output of the \emph{RepOk}. For example, the method can be
-used for logging values during the search.
-
+used for logging values during the search. Finally in section
+\ref{sec:code-reuse-with-reflection} we discuss about how using
+reflection in \emph{RepOk} implementations can help enabling code
+reuse, due to the generic nature of reflection.
 
 \section{Instrumentation of field accesses}
 \label{sec:instrumentation-of-field-accesses}
@@ -206,3 +208,86 @@ boolean repOK() {
 \caption{BinaryTree repOk using unaccounted field access for logging.}
 \label{fig:bTreeUnaccountedFieldAccess}
 \end{figure}
+
+\section{Code reuse with reflection}
+\label{sec:code-reuse-with-reflection}
+In this section we present how using reflection can enable code reuse
+and avoid code bloat in \emph{RepOk} methods. Figure
+\ref{fig:btreeAcyclicRepOk} shows the implementation of a method that
+can be be used to check the acyclicity property of an object graph. A
+generic implemtation like \emph{checkAcyclic} can be reused to check
+the acyclicity of many recursive datastructures like BinaryTree,
+LinkedList, Graph etc. Figure \ref{fig:btreeAcyclicRepOk} also shows a
+\emph{RepOk} implementation for a BinaryTree that uses the
+\emph{checkAcyclic} method.
+
+\para Using reflection in \emph{RepOk} implementations allows code
+reuse and also reduces code bloat. Therefore it makes it easier to
+write a library of methods that can potentially help the programmer in
+writing \emph{RepOk} methods for complex data structures. Figure
+\ref{fig:libraryEvaluationTable}  presents a comparision between the number of valid
+structures output by Korat when the \emph{RepOk} methods use the
+\emph{checkAcyclicity(Object o)} method and don't use the method (from
+Korat distribution) to check if the object graph is acyclic. It was
+observed that both sets of implementations of \emph{RepOk} methods
+evaluate the same number of candidate structures and output the same
+number of valid structures. We observed a very negligible (less than
+0.1 seconds) execution time difference between the \emph{RepOk}
+implementations presented.
+
+
+\begin{figure}
+\centering
+\begin{lstlisting}[language=Java]
+private static Set checkAcyclic(Object obj){
+    Class<?> objClass = obj.getClass();
+    Field[] objFields = objClass.getDeclaredFields();
+    List<Field> matchingFields = new ArrayList<Field>();
+    for(Field field : objFields){
+        if(field.getType().equals(objClass)){
+            matchingFields.add(field);
+        }
+    }
+    Set visited = new HashSet();
+    visited.add(obj);
+    LinkedList workList = new LinkedList();
+    workList.add(obj);
+    while (!workList.isEmpty()) {
+        Object current = workList.removeFirst();
+        for(Field field : matchingFields){
+            if(getFieldValue(current, field.getName()) != null){
+                if(!visited.add(getFieldValue(current, field.getName()))) return null;
+                workList.add(getFieldValue(current, field.getName()));
+            }
+        }
+    }
+    return visited;
+}
+
+boolean repOK() {
+    // checks that empty tree has size zero.
+    if (root == null) return size == 0;
+    // checks that the object graph is a tree.
+    Set nodeSet = checkAcyclic(root);
+    // checks that the size is consistent.
+    return (nodeSet != null && nodeSet.size() == size);
+}
+\end{lstlisting}
+\caption{Binary tree example with RepOk using a generic checkAcyclic method written using reflection.}
+\label{fig:btreeAcyclicRepOk}
+\end{figure}
+
+
+
+\begin{table}[h]
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+ & \multicolumn{3}{c|}{\begin{tabular}[c]{@{}c@{}}\# of structures \\ explored/valid \\ without code reuse\end{tabular}} & \multicolumn{3}{c|}{\begin{tabular}[c]{@{}c@{}}\# of structures \\ explored/valid \\ with code reuse\end{tabular}} \\ \hline
+Scope size & 5 & 6 & 7 & 5 & 6 & 7 \\ \hline
+BinaryTree & \begin{tabular}[c]{@{}c@{}}1272/\\ 65\end{tabular} & \begin{tabular}[c]{@{}c@{}}4835/\\ 197\end{tabular} & \begin{tabular}[c]{@{}c@{}}18474/\\ 626\end{tabular} & \begin{tabular}[c]{@{}c@{}}1272/\\ 65\end{tabular} & \begin{tabular}[c]{@{}c@{}}4835/\\ 197\end{tabular} & \begin{tabular}[c]{@{}c@{}}18474/\\ 626\end{tabular} \\ \hline
+LinkedList & \begin{tabular}[c]{@{}c@{}}259/\\ 24\end{tabular} & \begin{tabular}[c]{@{}c@{}}974/\\ 76\end{tabular} & \begin{tabular}[c]{@{}c@{}}4147/\\ 279\end{tabular} & \begin{tabular}[c]{@{}c@{}}259/\\ 24\end{tabular} & \begin{tabular}[c]{@{}c@{}}974/\\ 76\end{tabular} & \begin{tabular}[c]{@{}c@{}}4147/\\ 279\end{tabular} \\ \hline
+SortedList & \begin{tabular}[c]{@{}c@{}}507/\\ 126\end{tabular} & \begin{tabular}[c]{@{}c@{}}2100/\\ 462\end{tabular} & \begin{tabular}[c]{@{}c@{}}9167/\\ 1716\end{tabular} & \begin{tabular}[c]{@{}c@{}}507/\\ 126\end{tabular} & \begin{tabular}[c]{@{}c@{}}2100/\\ 462\end{tabular} & \begin{tabular}[c]{@{}c@{}}9167/\\ 1716\end{tabular} \\ \hline
+\end{tabular}
+\caption{Number of valid structures generated by Korat when library for predicates is used in RepOk. All maximum finitization parameters are set to the size value.}
+\label{fig:libraryEvaluationTable}
+\end{table}
