@@ -1,4 +1,36 @@
 \chapter{Related work}
 \label{ch:related-work}
-yet to write related work.
+This chapter reviews the work related to improving Korat and static analysis. Section \ref{sec:attempts-to-improve-korat} discusses other projects that have improved different aspects of Korat. Section \ref{sec:related-static-analyses} discusses a few static program analysis tools that have tried to verify properties of datastructures.
+
+\section{Attemps to improve Korat}
+\label{sec:attempts-to-improve-korat}
+
+\section{Static Analysis}
+\label{sec:related-static-analyses}
+Several projects have developed static analyses for verifying program
+properties. We will discuss some of the projects that check properties
+of complex data structures. The Extended Static Checker (ESC)
+\cite{flanagan2002extended} uses a theoram prover to verify partial correctness of Java
+classes annotated with JML specifications. ESC can find faults such as
+null pointer dereferences, array bounds violations and division by
+zero. The Three-Valued-Logic Analyzer (TVLA) \cite{sagiv2002parametric} was the first
+system to implement a shape analysis, which verifies that programs
+with destructive updates preserve structural invariants of linked data
+structures. There has been work \cite{yorsh2004symbolically}  that extends TVLA to
+handle more properties of the content of the data structures and uses
+symbolic computation to automatically derive transfer functions, thus
+reducing the amount of work that the user needs to do.
+
+\para Kuncak et al. proposed Role Analysis \cite{kuncak2002role}, a compositional
+interprocedual analysis that verifies similar properties like
+TVLA. The same authors also developed Hob \cite{lam2005generalized}, an analysis
+framework that combines different static analysis and theoram proving
+techniques \cite{zee2004combining} to show complex data structure consistency
+properties. The Pointer Assertion Logic Engine (PALE) \cite{moller2001pointer} can
+verify a large set of data structures that have a spanning tree
+backbone, with possibly additional pointers that do not add extra
+information. Jalloy \cite{jackson2000finding,vaziri2003checking} analyzes methods that manipulate linked data
+structures by first building an alloy model of Java code and then
+checking it in a bounded-exhaustive manner with the Alloy Analyzer
+\cite{jackson2000alcoa}.
 
