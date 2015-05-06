@@ -1,24 +1,43 @@
+\begin{comment}
+sorted list
+boolean repOk() {
+    boolean b = acyclicAndSizeok(); // inline -- non-shortcircuiting
+    if (!b) return false;
+    boolean c = sorted(); // inline -- non-shortcircuiting
+    return c;
+}
+
+red-black tree
+boolean repOk() {
+    boolean b = acyclicAndSizeok(); // inline -- non-shortcircuiting
+    if (!b) return false;
+    boolean c = colorOK(); // inline -- non-shortcircuiting
+    boolean d = bst(); // inline -- non-shortcircuiting
+    return c && d;
+}
+\end{comment}
+
 \chapter{Evaluation}
 \label{ch:evaluation}
-This chapter presents an evaluation of how Korat performs when
-reflection support is absent. Section \ref{sec:benchmarks} discusses
+This chapter presents an experimental evaluation of how Korat performs when
+reflection support is absent. Section~\ref{sec:benchmarks} discusses
 the benchmark suite that we use in our evaluations. The suite consists
-of 5 data structure implementations. Section
-\ref{sec:generation-of-valid-structures} presents the results of
-experiments done with Korat without reflection support. The results
-show how Korat does not output expected results when reflection is
-used. Adding reflection support as discussed in chapter
-\ref{ch:adding-reflection} will make Korat function as expected when
-reflection is used in \emph{RepOk} predicates. We performed all
-experiments on an OSX machine with a 2.7Ghz, intel core i7 processor
-using Sun’s Java 6 SDK 1.6.0 JVM.
+of 5 data structure
+implementations. Section~\ref{sec:generation-of-valid-structures}
+presents the results of experiments done with Korat without reflection
+support. The results show how Korat does not output expected results
+when reflection is used. Adding reflection support as discussed in
+Chapter~\ref{ch:adding-reflection} will make Korat function as
+expected when reflection is used in \emph{RepOk} predicates. We
+performed all experiments on an OSX machine with a 2.7GHz, Intel core
+i7 processor using Sun’s Java 6 SDK 1.6.0 JVM.
 
 %Section \ref{sec:evaluation-of-library-for-predicates} presents a comparision between \emph{RepOk} methods written using the library for predicates and \emph{RepOk} methods from the Korat distribution.
 
 
 \section{Benchmarks}
 \label{sec:benchmarks}
-Figure \ref{fig:benchmarksAndFinitizationParams} shows the benchmarks
+Figure~\ref{fig:benchmarksAndFinitizationParams} shows the benchmarks
 that we used in our experiments. The benchmarks include
 implementations of text-book data structures and some data structures
 from the JCF (Java Collections Framework) that is a part of the
@@ -26,15 +45,15 @@ standard java libraries \cite{Linden:2004:JJJ:993931}. The names used for the be
 are from the Intentional naming system \cite{adjie1999design}.
 
 \begin{table}[h]
-\begin{tabular}{|c|c|c|}
+\resizebox{\columnwidth}{!}{\begin{tabular}{|c|c|c|}
 \hline
-Benchmark    & Package        & Finitization parameters                \\ \hline
-BinaryTree   & korat.examples & numNodes, minSize, maxSize             \\ \hline
-RedBlackTree & korat.examples & numEntries, minSize, maxSize, numKeys  \\ \hline
-LinkedList   & java.util      & numEntries, minSize, maxSize, numElems \\ \hline
-SortedList   & java.util      & numEntries, minSize, maxSize, numElems \\ \hline
-HeapArray    & korat.examples & minSize, maxSize, maxLength, maxElem   \\ \hline
-\end{tabular}
+Benchmark             & \textit{Package} & \textit{Finitization parameters}       \\ \hline
+\textit{BinaryTree}   & \texttt{korat.examples}   & \texttt{numNodes, minSize, maxSize}             \\ \hline
+\textit{RedBlackTree} & \texttt{korat.examples}   & \texttt{numEntries, minSize, maxSize, numKeys}  \\ \hline
+\textit{LinkedList}   & \texttt{java.util}        & \texttt{numEntries, minSize, maxSize, numElems} \\ \hline
+\textit{SortedList}   & \texttt{java.util}        & \texttt{numEntries, minSize, maxSize, numElems} \\ \hline
+\textit{HeapArray}    & \texttt{korat.examples}   & \texttt{minSize, maxSize, maxLength, maxElem}   \\ \hline
+\end{tabular}}
 \caption{Benchmarks and finitization parameters. Each benchmark is
   named after the class for which data structures are generated; the
   structures also contain objects from other classes.}
@@ -54,7 +73,7 @@ Following is a summary for the implementation of each benchmark :
 
 \section{Generation of valid structures}
 \label{sec:generation-of-valid-structures}
-For each benchmark shown in section \ref{sec:benchmarks}, we set all
+For each benchmark shown in Section~\ref{sec:benchmarks}, we set all
 finitization parameters such that Korat generates structures of upto a
 given \emph{size}. We set the \emph{maxSize} and other maximum
 parameters to the value of \emph{size} (also known as \emph{scope})
@@ -62,7 +81,7 @@ and \emph{minSize} to 0. For a range of sizes and four different
 \emph{RepOk} implementations, we tabulate the number of candidate
 structures that Korat evaluates, the number of valid structures that
 Korat generates and the time Korat takes to output the valid
-structures. Figure \ref{fig:resultsTable} presents the results for
+structures. Figure~\ref{fig:resultsTable} presents the results for
 generating valid structures for our benchmark suite, using Korat
 without reflection support.
 
@@ -89,7 +108,7 @@ without reflection support.
 \end{itemize}
 
 
-\para The results in figure \ref{fig:resultsTable} show that korat is
+\para The results in Figure~\ref{fig:resultsTable} show that korat is
 affected differently when reflection is used to access different
 fields. In cases where reflection is used to access a field early in
 the \emph{RepOk}, the Korat search terminates in under a second and
@@ -100,22 +119,23 @@ but, only outputs very few valid structures. This shows how the Korat
 search is affected differently based on the field accessed using
 reflection. Korat will be generate all valid non-isomorphic structures
 efficiently after we add reflection support to it as discussed in
-chapter \ref{ch:adding-reflection}.
+Chapter~\ref{ch:adding-reflection}.
 
 
 \begin{landscape}
 %\begin{sidewaystable}[h]
-\begin{table}
+\begin{table}[h]
+\centering
 \resizebox{\columnwidth}{!}{\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
 \hline
- & \multicolumn{6}{c|}{\begin{tabular}[c]{@{}c@{}}Field access \\ without reflection\end{tabular}} & \multicolumn{6}{c|}{\begin{tabular}[c]{@{}c@{}}Reflection used for\\  ``root/header'' field access\end{tabular}} & \multicolumn{6}{c|}{\begin{tabular}[c]{@{}c@{}}Reflection used for \\ ``size'' field access\end{tabular}} & \multicolumn{6}{c|}{\begin{tabular}[c]{@{}c@{}}Reflection used for \\ a recursive field access\end{tabular}} \\ \hline
- & \multicolumn{3}{c|}{\begin{tabular}[c]{@{}c@{}}\# of structures\\ explored/valid\end{tabular}} & \multicolumn{3}{c|}{\begin{tabular}[c]{@{}c@{}}Execution time \\ (in sec)\end{tabular}} & \multicolumn{3}{c|}{\begin{tabular}[c]{@{}c@{}}\# of structures\\ explored/valid\end{tabular}} & \multicolumn{3}{c|}{\begin{tabular}[c]{@{}c@{}}Execution time\\ (in sec)\end{tabular}} & \multicolumn{3}{c|}{\begin{tabular}[c]{@{}c@{}}\# of structures\\ explored/valid\end{tabular}} & \multicolumn{3}{c|}{\begin{tabular}[c]{@{}c@{}}Execution time\\ (in sec)\end{tabular}} & \multicolumn{3}{c|}{\begin{tabular}[c]{@{}c@{}}\# of structures\\ explored/valid\end{tabular}} & \multicolumn{3}{c|}{\begin{tabular}[c]{@{}c@{}}Execution time\\ (in sec)\end{tabular}} \\ \hline
-Scope size & 5 & 6 & 7 & 5 & 6 & 7 & 5 & 6 & 7 & 5 & 6 & 7 & 5 & 6 & 7 & 5 & 6 & 7 & 5 & 6 & 7 & 5 & 6 & 7 \\ \hline
-BinaryTree & \begin{tabular}[c]{@{}c@{}}1272/\\ 65\end{tabular} & \begin{tabular}[c]{@{}c@{}}4835/\\ 197\end{tabular} & \begin{tabular}[c]{@{}c@{}}18474/\\ 626\end{tabular} & 0.56 & 0.91 & 1.81 & \begin{tabular}[c]{@{}c@{}}7/\\ 2\end{tabular} & \begin{tabular}[c]{@{}c@{}}8/\\ 2\end{tabular} & \begin{tabular}[c]{@{}c@{}}9/\\ 2\end{tabular} & 0.22 & 0.21 & 0.22 & \begin{tabular}[c]{@{}c@{}}952/\\ 6\end{tabular} & \begin{tabular}[c]{@{}c@{}}3659/\\ 7\end{tabular} & \begin{tabular}[c]{@{}c@{}}14099/\\ 8\end{tabular} & 0.49 & 0.72 & 1.41 & \begin{tabular}[c]{@{}c@{}}9/\\ 2\end{tabular} & \begin{tabular}[c]{@{}c@{}}10/\\ 2\end{tabular} & \begin{tabular}[c]{@{}c@{}}11/\\ 2\end{tabular} & 0.20 & 0.21 & 0.25 \\ \hline
-RedBlackTree & \begin{tabular}[c]{@{}c@{}}6073/\\ 115\end{tabular} & \begin{tabular}[c]{@{}c@{}}25938/\\ 327\end{tabular} & \begin{tabular}[c]{@{}c@{}}112012/\\ 911\end{tabular} & 1.36 & 5.32 & 30.32 & \begin{tabular}[c]{@{}c@{}}9/\\ 2\end{tabular} & \begin{tabular}[c]{@{}c@{}}10/\\ 2\end{tabular} & \begin{tabular}[c]{@{}c@{}}11/\\ 2\end{tabular} & 0.34 & 0.27 & 0.27 & \begin{tabular}[c]{@{}c@{}}1387/\\ 6\end{tabular} & \begin{tabular}[c]{@{}c@{}}4958/\\ 7\end{tabular} & \begin{tabular}[c]{@{}c@{}}18769/\\ 8\end{tabular} & 0.74 & 1.23 & 3.27 & \begin{tabular}[c]{@{}c@{}}16/\\ 6\end{tabular} & \begin{tabular}[c]{@{}c@{}}18/\\ 7\end{tabular} & \begin{tabular}[c]{@{}c@{}}20/\\ 8\end{tabular} & 0.30 & 0.31 & 0.32 \\ \hline
-LinkedList & \begin{tabular}[c]{@{}c@{}}259/\\ 24\end{tabular} & \begin{tabular}[c]{@{}c@{}}974/\\ 76\end{tabular} & \begin{tabular}[c]{@{}c@{}}4147/\\ 279\end{tabular} & 0.40 & 0.53 & 0.79 & \begin{tabular}[c]{@{}c@{}}1/\\ 0\end{tabular} & \begin{tabular}[c]{@{}c@{}}1/\\ 0\end{tabular} & \begin{tabular}[c]{@{}c@{}}1/\\ 0\end{tabular} & 0.22 & 0.23 & 0.23 & \begin{tabular}[c]{@{}c@{}}144/\\ 5\end{tabular} & \begin{tabular}[c]{@{}c@{}}524/\\ 6\end{tabular} & \begin{tabular}[c]{@{}c@{}}2201/\\ 7\end{tabular} & 0.29 & 0.45 & 0.65 & \begin{tabular}[c]{@{}c@{}}4/\\ 1\end{tabular} & \begin{tabular}[c]{@{}c@{}}4/\\ 1\end{tabular} & \begin{tabular}[c]{@{}c@{}}4/\\ 1\end{tabular} & 0.22 & 0.23 & 0.25 \\ \hline
-SortedList & \begin{tabular}[c]{@{}c@{}}507/\\ 126\end{tabular} & \begin{tabular}[c]{@{}c@{}}2100/\\ 462\end{tabular} & \begin{tabular}[c]{@{}c@{}}9167/\\ 1716\end{tabular} & 0.48 & 0.81 & 1.44 & \begin{tabular}[c]{@{}c@{}}1/\\ 0\end{tabular} & \begin{tabular}[c]{@{}c@{}}1/\\ 0\end{tabular} & \begin{tabular}[c]{@{}c@{}}1/\\ 0\end{tabular} & 0.25 & 0.24 & 0.24 & \begin{tabular}[c]{@{}c@{}}71/\\ 5\end{tabular} & \begin{tabular}[c]{@{}c@{}}95/\\ 6\end{tabular} & \begin{tabular}[c]{@{}c@{}}122/\\ 7\end{tabular} & 0.29 & 0.31 & 0.34 & \begin{tabular}[c]{@{}c@{}}7/\\ 0\end{tabular} & \begin{tabular}[c]{@{}c@{}}8/\\ 0\end{tabular} & \begin{tabular}[c]{@{}c@{}}9/\\ 0\end{tabular} & 0.24 & 0.29 & 0.26 \\ \hline
-HeapArray & \begin{tabular}[c]{@{}c@{}}8916/\\ 1919\end{tabular} & \begin{tabular}[c]{@{}c@{}}64533/\\ 13139\end{tabular} & \begin{tabular}[c]{@{}c@{}}519968/\\ 117562\end{tabular} & 0.92 & 3.21 & 41.63 & \begin{tabular}[c]{@{}c@{}}1/\\ 0\end{tabular} & \begin{tabular}[c]{@{}c@{}}1/\\ 0\end{tabular} & \begin{tabular}[c]{@{}c@{}}1/\\ 0\end{tabular} & 0.20 & 0.17 & 0.18 & \begin{tabular}[c]{@{}c@{}}22/\\ 6\end{tabular} & \begin{tabular}[c]{@{}c@{}}26/\\ 7\end{tabular} & \begin{tabular}[c]{@{}c@{}}30/\\ 8\end{tabular} & 0.20 & 0.21 & 0.19 & \begin{tabular}[c]{@{}c@{}}3/\\ 1\end{tabular} & \begin{tabular}[c]{@{}c@{}}3/\\ 1\end{tabular} & \begin{tabular}[c]{@{}c@{}}3/\\ 1\end{tabular} & 0.27 & 0.25 & 0.26 \\ \hline
+ & \multicolumn{6}{c|}{\textit{\begin{tabular}[c]{@{}c@{}}Field access \\ without reflection\end{tabular}}} & \multicolumn{6}{c|}{\textit{\begin{tabular}[c]{@{}c@{}}Reflection used for\\  ``root/header'' field access\end{tabular}}} & \multicolumn{6}{c|}{\textit{\begin{tabular}[c]{@{}c@{}}Reflection used for \\ ``size'' field access\end{tabular}}} & \multicolumn{6}{c|}{\textit{\begin{tabular}[c]{@{}c@{}}Reflection used for \\ a recursive field access\end{tabular}}} \\ \hline
+ & \multicolumn{3}{c|}{\textit{\begin{tabular}[c]{@{}c@{}}\# of structures\\ explored/valid\end{tabular}}} & \multicolumn{3}{c|}{\textit{\begin{tabular}[c]{@{}c@{}}Execution time \\ (in sec)\end{tabular}}} & \multicolumn{3}{c|}{\textit{\begin{tabular}[c]{@{}c@{}}\# of structures\\ explored/valid\end{tabular}}} & \multicolumn{3}{c|}{\textit{\begin{tabular}[c]{@{}c@{}}Execution time\\ (in sec)\end{tabular}}} & \multicolumn{3}{c|}{\textit{\begin{tabular}[c]{@{}c@{}}\# of structures\\ explored/valid\end{tabular}}} & \multicolumn{3}{c|}{\textit{\begin{tabular}[c]{@{}c@{}}Execution time\\ (in sec)\end{tabular}}} & \multicolumn{3}{c|}{\textit{\begin{tabular}[c]{@{}c@{}}\# of structures\\ explored/valid\end{tabular}}} & \multicolumn{3}{c|}{\textit{\begin{tabular}[c]{@{}c@{}}Execution time\\ (in sec)\end{tabular}}} \\ \hline
+\textit{Scope size} & 5 & 6 & 7 & 5 & 6 & 7 & 5 & 6 & 7 & 5 & 6 & 7 & 5 & 6 & 7 & 5 & 6 & 7 & 5 & 6 & 7 & 5 & 6 & 7 \\ \hline
+\textit{BinaryTree} & \begin{tabular}[c]{@{}c@{}}1272/\\ 65\end{tabular} & \begin{tabular}[c]{@{}c@{}}4835/\\ 197\end{tabular} & \begin{tabular}[c]{@{}c@{}}18474/\\ 626\end{tabular} & 0.56 & 0.91 & 1.81 & \begin{tabular}[c]{@{}c@{}}7/\\ 2\end{tabular} & \begin{tabular}[c]{@{}c@{}}8/\\ 2\end{tabular} & \begin{tabular}[c]{@{}c@{}}9/\\ 2\end{tabular} & 0.22 & 0.21 & 0.22 & \begin{tabular}[c]{@{}c@{}}952/\\ 6\end{tabular} & \begin{tabular}[c]{@{}c@{}}3659/\\ 7\end{tabular} & \begin{tabular}[c]{@{}c@{}}14099/\\ 8\end{tabular} & 0.49 & 0.72 & 1.41 & \begin{tabular}[c]{@{}c@{}}9/\\ 2\end{tabular} & \begin{tabular}[c]{@{}c@{}}10/\\ 2\end{tabular} & \begin{tabular}[c]{@{}c@{}}11/\\ 2\end{tabular} & 0.20 & 0.21 & 0.25 \\ \hline
+\textit{RedBlackTree} & \begin{tabular}[c]{@{}c@{}}6073/\\ 115\end{tabular} & \begin{tabular}[c]{@{}c@{}}25938/\\ 327\end{tabular} & \begin{tabular}[c]{@{}c@{}}112012/\\ 911\end{tabular} & 1.36 & 5.32 & 30.32 & \begin{tabular}[c]{@{}c@{}}9/\\ 2\end{tabular} & \begin{tabular}[c]{@{}c@{}}10/\\ 2\end{tabular} & \begin{tabular}[c]{@{}c@{}}11/\\ 2\end{tabular} & 0.34 & 0.27 & 0.27 & \begin{tabular}[c]{@{}c@{}}1387/\\ 6\end{tabular} & \begin{tabular}[c]{@{}c@{}}4958/\\ 7\end{tabular} & \begin{tabular}[c]{@{}c@{}}18769/\\ 8\end{tabular} & 0.74 & 1.23 & 3.27 & \begin{tabular}[c]{@{}c@{}}16/\\ 6\end{tabular} & \begin{tabular}[c]{@{}c@{}}18/\\ 7\end{tabular} & \begin{tabular}[c]{@{}c@{}}20/\\ 8\end{tabular} & 0.30 & 0.31 & 0.32 \\ \hline
+\textit{LinkedList} & \begin{tabular}[c]{@{}c@{}}259/\\ 24\end{tabular} & \begin{tabular}[c]{@{}c@{}}974/\\ 76\end{tabular} & \begin{tabular}[c]{@{}c@{}}4147/\\ 279\end{tabular} & 0.40 & 0.53 & 0.79 & \begin{tabular}[c]{@{}c@{}}1/\\ 0\end{tabular} & \begin{tabular}[c]{@{}c@{}}1/\\ 0\end{tabular} & \begin{tabular}[c]{@{}c@{}}1/\\ 0\end{tabular} & 0.22 & 0.23 & 0.23 & \begin{tabular}[c]{@{}c@{}}144/\\ 5\end{tabular} & \begin{tabular}[c]{@{}c@{}}524/\\ 6\end{tabular} & \begin{tabular}[c]{@{}c@{}}2201/\\ 7\end{tabular} & 0.29 & 0.45 & 0.65 & \begin{tabular}[c]{@{}c@{}}4/\\ 1\end{tabular} & \begin{tabular}[c]{@{}c@{}}4/\\ 1\end{tabular} & \begin{tabular}[c]{@{}c@{}}4/\\ 1\end{tabular} & 0.22 & 0.23 & 0.25 \\ \hline
+\textit{SortedList} & \begin{tabular}[c]{@{}c@{}}507/\\ 126\end{tabular} & \begin{tabular}[c]{@{}c@{}}2100/\\ 462\end{tabular} & \begin{tabular}[c]{@{}c@{}}9167/\\ 1716\end{tabular} & 0.48 & 0.81 & 1.44 & \begin{tabular}[c]{@{}c@{}}1/\\ 0\end{tabular} & \begin{tabular}[c]{@{}c@{}}1/\\ 0\end{tabular} & \begin{tabular}[c]{@{}c@{}}1/\\ 0\end{tabular} & 0.25 & 0.24 & 0.24 & \begin{tabular}[c]{@{}c@{}}71/\\ 5\end{tabular} & \begin{tabular}[c]{@{}c@{}}95/\\ 6\end{tabular} & \begin{tabular}[c]{@{}c@{}}122/\\ 7\end{tabular} & 0.29 & 0.31 & 0.34 & \begin{tabular}[c]{@{}c@{}}7/\\ 0\end{tabular} & \begin{tabular}[c]{@{}c@{}}8/\\ 0\end{tabular} & \begin{tabular}[c]{@{}c@{}}9/\\ 0\end{tabular} & 0.24 & 0.29 & 0.26 \\ \hline
+\textit{HeapArray} & \begin{tabular}[c]{@{}c@{}}8916/\\ 1919\end{tabular} & \begin{tabular}[c]{@{}c@{}}64533/\\ 13139\end{tabular} & \begin{tabular}[c]{@{}c@{}}519968/\\ 117562\end{tabular} & 0.92 & 3.21 & 41.63 & \begin{tabular}[c]{@{}c@{}}1/\\ 0\end{tabular} & \begin{tabular}[c]{@{}c@{}}1/\\ 0\end{tabular} & \begin{tabular}[c]{@{}c@{}}1/\\ 0\end{tabular} & 0.20 & 0.17 & 0.18 & \begin{tabular}[c]{@{}c@{}}22/\\ 6\end{tabular} & \begin{tabular}[c]{@{}c@{}}26/\\ 7\end{tabular} & \begin{tabular}[c]{@{}c@{}}30/\\ 8\end{tabular} & 0.20 & 0.21 & 0.19 & \begin{tabular}[c]{@{}c@{}}3/\\ 1\end{tabular} & \begin{tabular}[c]{@{}c@{}}3/\\ 1\end{tabular} & \begin{tabular}[c]{@{}c@{}}3/\\ 1\end{tabular} & 0.27 & 0.25 & 0.26 \\ \hline
 \end{tabular}}
 \caption{Number of valid structures generated by Korat when reflection is used for field accesses. All maximum finitization parameters are set to the size value. Time is elapsed real time in seconds.}
 \label{fig:resultsTable}
@@ -123,37 +143,19 @@ HeapArray & \begin{tabular}[c]{@{}c@{}}8916/\\ 1919\end{tabular} & \begin{tabula
 %\end{sidewaystable}
 \end{landscape}
 
-\begin{comment}
-\section{Evaluation of library for predicates}
-\label{sec:evaluation-of-library-for-predicates}
-This section presents the number of valid structures output by Korat when the
-\emph{RepOk} methods use the library for predicates presented in
-chapter \ref{ch:library-for-predicates}. Specifically, each
-\emph{RepOk} implementation uses the \emph{checkAcyclicity(Object o)}
-method to check if the object graph is acyclic. Figure
-\ref{fig:libraryEvaluationTable} shows the results of running Korat
-with \emph{RepOk} methods from the Korat distribution and the
-\emph{RepOk} methods that use the \emph{checkAcyclicity} method. It
-was observed that both sets of implementations of \emph{RepOk} methods
-evaluate the same number of candidate structures and output the same
-number of valid structures. We observed a very negligible (less than 0.1
-seconds) execution time difference between the \emph{RepOk}
-implementations presented. We believe that the advantages (code reuse,
-avoided code bloat) of using the library for predicates for
-\emph{RepOk} implentations outweigh the negligible increase in the
-execution time.
+
+\section{Performance of Inefficient predicates}
 
 \begin{table}[h]
-\begin{tabular}{|c|c|c|c|c|c|c|}
+\resizebox{\columnwidth}{!}{\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
 \hline
- & \multicolumn{3}{c|}{\begin{tabular}[c]{@{}c@{}}\# of structures \\ explored/valid \\ without a library call\end{tabular}} & \multicolumn{3}{c|}{\begin{tabular}[c]{@{}c@{}}\# of structures \\ explored/valid \\ with a library call\end{tabular}} \\ \hline
-Scope size & 5 & 6 & 7 & 5 & 6 & 7 \\ \hline
-BinaryTree & \begin{tabular}[c]{@{}c@{}}1272/\\ 65\end{tabular} & \begin{tabular}[c]{@{}c@{}}4835/\\ 197\end{tabular} & \begin{tabular}[c]{@{}c@{}}18474/\\ 626\end{tabular} & \begin{tabular}[c]{@{}c@{}}1272/\\ 65\end{tabular} & \begin{tabular}[c]{@{}c@{}}4835/\\ 197\end{tabular} & \begin{tabular}[c]{@{}c@{}}18474/\\ 626\end{tabular} \\ \hline
-RedBlackTree & \begin{tabular}[c]{@{}c@{}}6073/\\ 115\end{tabular} & \begin{tabular}[c]{@{}c@{}}25938/\\ 327\end{tabular} & \begin{tabular}[c]{@{}c@{}}112012/\\ 911\end{tabular} & \begin{tabular}[c]{@{}c@{}}6073/\\ 115\end{tabular} & \begin{tabular}[c]{@{}c@{}}25938/\\ 327\end{tabular} & \begin{tabular}[c]{@{}c@{}}112012/\\ 911\end{tabular} \\ \hline
-LinkedList & \begin{tabular}[c]{@{}c@{}}259/\\ 24\end{tabular} & \begin{tabular}[c]{@{}c@{}}974/\\ 76\end{tabular} & \begin{tabular}[c]{@{}c@{}}4147/\\ 279\end{tabular} & \begin{tabular}[c]{@{}c@{}}259/\\ 24\end{tabular} & \begin{tabular}[c]{@{}c@{}}974/\\ 76\end{tabular} & \begin{tabular}[c]{@{}c@{}}4147/\\ 279\end{tabular} \\ \hline
-SortedList & \begin{tabular}[c]{@{}c@{}}507/\\ 126\end{tabular} & \begin{tabular}[c]{@{}c@{}}2100/\\ 462\end{tabular} & \begin{tabular}[c]{@{}c@{}}9167/\\ 1716\end{tabular} & \begin{tabular}[c]{@{}c@{}}507/\\ 126\end{tabular} & \begin{tabular}[c]{@{}c@{}}2100/\\ 462\end{tabular} & \begin{tabular}[c]{@{}c@{}}9167/\\ 1716\end{tabular} \\ \hline
-\end{tabular}
-\caption{Number of valid structures generated by Korat when library for predicates is used in RepOk. All maximum finitization parameters are set to the size value.}
-\label{fig:libraryEvaluationTable}
+ & \multicolumn{4}{c|}{\textit{\begin{tabular}[c]{@{}c@{}}\# of structures \\ explored/valid \\ with an \\ efficient RepOk\end{tabular}}} & \multicolumn{4}{c|}{\begin{tabular}[c]{@{}c@{}}\# of structures \\ explored/valid \\ with an \\ Inefficient RepOK\end{tabular}} \\ \hline
+\textit{Scope size} & 3 & 4 & 5 & 6 & 3 & 4 & 5 & 6 \\ \hline
+\textit{BinaryTree} & \begin{tabular}[c]{@{}c@{}}90/\\ 9\end{tabular} & \begin{tabular}[c]{@{}c@{}}337/\\ 23\end{tabular} & \begin{tabular}[c]{@{}c@{}}1272/\\ 65\end{tabular} & \begin{tabular}[c]{@{}c@{}}4835/\\ 197\end{tabular} & \begin{tabular}[c]{@{}c@{}}3464/\\ 9\end{tabular} & \begin{tabular}[c]{@{}c@{}}105455/\\ 23\end{tabular} & \begin{tabular}[c]{@{}c@{}}3922746/\\ 65\end{tabular} & \begin{tabular}[c]{@{}c@{}}171432317/\\ 197\end{tabular} \\ \hline
+\textit{LinkedList} & \begin{tabular}[c]{@{}c@{}}29/\\ 4\end{tabular} & \begin{tabular}[c]{@{}c@{}}80/\\ 9\end{tabular} & \begin{tabular}[c]{@{}c@{}}259/\\ 24\end{tabular} & \begin{tabular}[c]{@{}c@{}}974/\\ 76\end{tabular} & \begin{tabular}[c]{@{}c@{}}320/\\ 4\end{tabular} & \begin{tabular}[c]{@{}c@{}}1700/\\ 9\end{tabular} & \begin{tabular}[c]{@{}c@{}}9348/\\ 24\end{tabular} & \begin{tabular}[c]{@{}c@{}}53879/\\ 76\end{tabular} \\ \hline
+\textit{SortedList} & \begin{tabular}[c]{@{}c@{}}51/\\ 10\end{tabular} & \begin{tabular}[c]{@{}c@{}}143/\\ 35\end{tabular} & \begin{tabular}[c]{@{}c@{}}507/\\ 126\end{tabular} & \begin{tabular}[c]{@{}c@{}}2100/\\ 462\end{tabular} & \begin{tabular}[c]{@{}c@{}}2259/\\ 10\end{tabular} & \begin{tabular}[c]{@{}c@{}}33983/\\ 35\end{tabular} & \begin{tabular}[c]{@{}c@{}}601209/\\ 126\end{tabular} & \begin{tabular}[c]{@{}c@{}}12267209/\\ 462\end{tabular} \\ \hline
+\multicolumn{1}{|l|}{\textit{RedBlackTree}} & \begin{tabular}[c]{@{}c@{}}243/\\ 16\end{tabular} & \begin{tabular}[c]{@{}c@{}}1270/\\ 41\end{tabular} & \begin{tabular}[c]{@{}c@{}}6073/\\ 115\end{tabular} & \begin{tabular}[c]{@{}c@{}}25938/\\ 327\end{tabular} & \begin{tabular}[c]{@{}c@{}}17695/\\ 16\end{tabular} & \begin{tabular}[c]{@{}c@{}}684967/\\ 41\end{tabular} & \begin{tabular}[c]{@{}c@{}}31247487/\\ 115\end{tabular} & \begin{tabular}[c]{@{}c@{}}1629892151/\\ 327\end{tabular} \\ \hline
+\end{tabular}}
+\caption{Number of valid structures generated by Korat when an inefficient predicate is used. All maximum finitization parameters are set to the size value.}
+\label{fig:peformanceResultsTable}
 \end{table}
-\end{comment}

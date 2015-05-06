@@ -1,47 +1,53 @@
-\chapter{Adding reflection support to Korat}
+\chapter{Supoport for reflection in Korat}
 \label{ch:adding-reflection}
-In this chapter, we will discuss a technique that builds on Korat to
-allow the use of reflection for field accesses by \emph{RepOk}. Recall
-from section \ref{sec:usage-of-reflection-for-field-access} of chapter
-\ref{ch:shortcomings-of-korat}, the use of reflection for field
-accesses in a \emph{RepOk} method may render Korat unable to generate
-some valid structures. When reflection is used for field access, Korat
-terminates its search early as it has no way to account for the field
-access made using reflection. Korat evaluates lesser candidate
-structures than expected and therefore outputs lesser number of valid
-structures.
+This chapter presents our technique for adding support for reflection
+in Korat so that users can write RepOk methods that may use the Java
+reflection API for accessing object fields.  Moreover, we discuss how
+to allow users to exclude certain field accesses from being monitored,
+as well as how to support them more easily write RepOk methods.
 
-\para In section \ref{sec:instrumentation-of-field-accesses} we
-introduce the technique used by Korat to monitor field accesses. In
-section \ref{sec:adding-reflection-to-instrumentation} we discuss a
-technique to build on Korat's instrumentation to monitor field
-accesses that use the Java reflection API. In section
-\ref{ch:unaccounted-field-accesses} we present a method that can be
-used to make a feild access that doesn't affect Korat's search
-algorithm. We call it an \emph{unaccounted field access} and it is
-useful when the field access is used for something that does not
-affect the output of the \emph{RepOk}. For example, the method can be
-used for logging values during the search. Finally in section
-\ref{sec:code-reuse-with-reflection} we discuss about how using
-reflection in \emph{RepOk} implementations can help enabling code
-reuse, due to the generic nature of reflection.
+Recall from section \ref{sec:usage-of-reflection-for-field-access} of
+Chapter~\ref{ch:shortcomings-of-korat}, the use of reflection for
+field accesses in a \emph{RepOk} method may render the original Korat
+implementation unable to generate some valid structures.  Reflection
+causes Korat to terminate its search early because Korat is unable to
+create the state-space necessary to explore possible values for fields
+that are accessed using reflection, thereby causing Korat to evaluate
+lesser candidate structures than necessary and therefore outputting
+lesser number of valid structures.
+
+\para In Section~\ref{sec:instrumentation-of-field-accesses} we
+outline the basic technique used by Korat to monitor field accesses.
+In Section~\ref{sec:adding-reflection-to-instrumentation} we present
+our technique that builds on Korat's instrumentation to monitor field
+accesses made using the Java reflection API. In
+Section~\ref{ch:unaccounted-field-accesses} we describe how to allow
+users to exclude certain field accesses from being monitored; we term
+such access an \emph{unaccounted field access}; such accesses are
+useful, for example, to log desired field values.  In
+Section~\ref{sec:code-reuse-with-reflection} we discuss how the use of
+reflection can provide code re-use for writing parts of RepOk methods.
 
 \section{Instrumentation of field accesses}
 \label{sec:instrumentation-of-field-accesses}
-Korat monitors direct field accesses by instrumenting the code written
-by the user. Korat performs source-source translation that instruments
-all classes whose objects appear in the \emph{finitization} method
-written by the user. Korat uses the observer pattern
-\cite{gamma1994design} to monitor executions of the \emph{RepOk}
-method (and transitively invoked methods) to build a stack of accessed
-fields. For each class, the instrumentation adds a special constructor
-and a field for the observer, as shown in figure
-\ref{fig:btTreeInstrumentationKorat}. For each field in a class, the
-instrumentation adds an identifier field and getter/setter methods for
-the field. Finally, in the code for the \emph{RepOk} method and all
-the methods that the \emph{RepOk} transitively invokes, the
-instrumentation replaces each read/write of the field with the
-generated getter/setter methods respectively.
+Korat monitors direct field accesses by using bytecode instrumention
+of the code written by the user.  Korat instruments all classes whose
+objects appear in the \emph{finitization} method written by the
+user. Korat uses the observer pattern \cite{gamma1994design} to
+monitor executions of the \emph{RepOk} method (and transitively
+invoked methods) to build a stack of accessed fields. For each class,
+the instrumentation adds a special constructor and a field for the
+observer.
+
+\para For ease of exposition, we illustrate the instrumentation at the
+source-code level using an example from Marinov's
+dissertation~\cite{marinov2005automatic} (Figure~\ref{fig:btTreeInstrumentationKorat}).
+For each declared field, the instrumentation adds an identifier field
+and getter/setter methods for the field. Finally, in the code for the
+\emph{RepOk} method and all the methods that the \emph{RepOk}
+transitively invokes (omitted in the figure), the instrumentation
+replaces each read/write of the field with the generated getter/setter
+methods respectively.
 
 \para The special constructor generated by the instrumentation
 initializes the \emph{korat\_observer} field and the identifiers for all
@@ -90,95 +96,89 @@ class BinaryTree {
         size = value;
     }
    
-    // a repOk where all the field accesses are 
-    // replaced with the korat getter and setter methods.
 }
 \end{lstlisting}
-\caption{Instrumentation of BinaryTree class by Korat.}
+\caption{Instrumentation of BinaryTree class by Korat~\cite{marinov2005automatic}.}
 \label{fig:btTreeInstrumentationKorat}
 \end{figure}
 
 
 \section{Adding reflection to Korat instrumentation}
 \label{sec:adding-reflection-to-instrumentation}
-Korat fails to monitor field accesses that use the Java reflection
-API. In order to instrument field accesses that use the Java
-reflection API, Korat instrumentation needs to replace each read/write
-that uses reflection with a method that notifies the field observer
-about the access. 
+Since Korat instrumentation targets direct field accesses only, it
+fails to monitor field accesses that use the Java reflection API. To
+suport the use of reflection, Korat instrumentation needs to replace
+each access that uses reflection with a method that notifies the
+field observer about the access.
 
-\para The \emph{getFieldValue} method from the \emph{ReflectionUtils}
-class (shown in figure \ref{fig:fieldClassInstrumentationMethods})
-notifies the corresponding \emph{korat\_observer} for the field
-accessed using the method. Figure
-\ref{fig:fieldClassInstrumentationMethods} shows all the methods in
-the \emph{java.reflect.Field} class that can used to access a field
-using the Java reflection API. The figure does not show methods that
-can be used to set the value of field using reflection. The Korat
-instrumentation needs to look for invocation of these methods in the
-\emph{RepOk} method and replace them with the getFieldValue method as
-shown in figure \ref{fig:fieldClassInstrumentationMethods}. This will
-make Korat account for the field access made using the Java reflection
-API and the Korat search will perform as expected when reflection is
-used in the \emph{RepOk} implementation.
+Our technique introduces a small library to support field accesses
+based on reflection.  Specifically, our library methods perform field
+accesses using the Java reflection API and in addition also notify
+Korat of the particular accesses.  Our basic algorithm to support
+reflection has two steps:
+\begin{enumerate}
+\item Bytecode instrumentation of RepOk to performs all the steps of
+  Korat's original instrumentation and in addition replace invocations
+  of \texttt{get} methods from Java reflection API with invocations of
+  our library methods; and
+\item Execution of Korat on the resulting RepOk.
+\end{enumerate}
 
-\begin{figure}
+Figure~\ref{fig:fieldClassInstrumentationMethods} shows how our
+technique replaces the invocations of Java reflection API methods with
+invocations of our library methods.  Each of our library methods
+notifies the corresponding \emph{korat\_observer} (introduced during
+instrumentation) about the field accessed.
+
+
+\begin{table}[h]
 \centering
-\begin{lstlisting}[language=Java]
-//method call that makes Korat account for field access that uses the Java reflection API.
-Object obj = ReflectionUtils.getFieldValue(Object obj, Field field);
-
-//different ways to access a field using Java Reflection API
-Field field = BinaryTree.class.getDeclaredField(``left'');
-Object obj = field.get(Object obj);
-boolean obj = field.getBoolean(Object obj)
-byte obj = field.getByte(Object obj)
-char obj = field.getChar(Object obj)
-double obj = field.getDouble(Object obj)
-float obj = field.getFloat(Object obj)
-int obj = field.getInt(Object obj)
-long obj = field.getLong(Object obj)
-short obj = field.getShort(Object obj)
-
-// Instrumentation replaces the java reflection API call with our API call
-field.get(obj) -> ReflectionUtils.getFieldValue(obj,field);
-\end{lstlisting}
-\caption{Methods of the field class that the instrumentation needs to replace with the getFieldValue method.}
+\resizebox{\columnwidth}{!}{\begin{tabular}{|c|c|}
+\hline
+\textit{Java reflection API method} & \textit{Our library method}                  \\ \hline
+\texttt{Field f, Object o;}                  & \texttt{Field f, Object o;}                           \\ \hline
+\texttt{Object obj = f.get(o);}              & \texttt{Object obj = ReflectionUtils.get(o,f);}       \\ \hline
+\texttt{boolean b = f.getBoolean(o);}        & \texttt{boolean b = ReflectionUtils.getBoolean(o,f);} \\ \hline
+\texttt{byte by = f.getByte(o);}             & \texttt{byte by = ReflectionUtils.getByte(o,f);}      \\ \hline
+\texttt{char ch = f.getChar(o);}             & \texttt{char ch = ReflectionUtils.getChar(o,f);}      \\ \hline
+\texttt{double d = f.getDouble(o);}          & \texttt{double d = ReflectionUtils.getDouble(o,f);}   \\ \hline
+\texttt{float fl = f.getFloat(o);}           & \texttt{float fl = ReflectionUtils.getFloat(o,f);}    \\ \hline
+\texttt{int i = f.getInt(o);}                & \texttt{int i = ReflectionUtils.getInt(o,f);}         \\ \hline
+\texttt{long lo = f.getLong(o);}             & \texttt{long lo = ReflectionUtils.getLong(o,f);}      \\ \hline
+\texttt{short s = f.getShort(o);}            & \texttt{short s = ReflectionUtils.getShort(o,f);}     \\ \hline
+\end{tabular}}
+\caption{Methods of the Java reflection API that the instrumentation needs to replace with our library methods.}
 \label{fig:fieldClassInstrumentationMethods}
-\end{figure}
+\end{table}
+
 
 \section{Unaccounted field accesses}
 \label{ch:unaccounted-field-accesses}
-Recall, Korat monitors all field accesses by instrumenting the
-\emph{RepOk} method written by the user. Recall from section
-\ref{sec:inefficient-predicates} that a poorly-written \emph{RepOk}
-may adversely affect the performance of Korat and force it to explore
-many more states than necessary. A poorly-written written \emph{RepOk}
-method accesses fields even after the result of the \emph{RepOk} is
-decided. There may be situations where the programmer wants to access
-a field inside the \emph{RepOk} method for reasons that don't affect
-the result of the \emph{RepOk} method. For example, the programmer may
-want to log the value of a field or notify an external observer about
-a change in a field. Since Korat monitors all field accesses by
-insrumenting them, we provide a method for field access that can be
-used in situations where the user does not want the Korat search to be
-affected by the field access.
+To provide flexibility in writing RepOk methods, specifically to
+support methods that may make some field accesses for logging
+information purposes rather than for directly determining the input's
+validity, our library provides a special method
+\texttt{ReflectionUtils.unaccountedAccess(Object o,String fieldName)}
+that allows accessing a field value using reflection but without
+notifying Korat.
 
-\para The \emph{unaccountedAccess} method in the ReflectionUtils class
-offers a way to access a field without accounting for its access. This
-method uses the Java reflection API to access the field. Recall, Korat
-instrumentation doesn't instrument field accesses made using the Java
-reflection API. The instrumentation technique presented in section
-\ref{adding-reflection-to-instrumentation} ignores instrumenting the
-\emph{unaccountedAccess} method and therefore the field access made by
-the \emph{unaccountedAccess} method does not affect the Korat search
-algorithm. Figure \ref{fig:bTreeUnaccountedFieldAccess} shows an
-example usage of the method for logging. 
+Figure~\ref{fig:bTreeUnaccountedFieldAccess} shows an example usage of
+a field access that is unaccounted (for Korat search).  In this
+example, the user chooses to check the current value of \texttt{size}
+field and output an appropriate message (Line~\ref{line:unacc_access}) even though a
+violation of acyclicity is found and there is no need to access size
+to determine the input's validity.  Were Korat to be notified of this
+extraneous access to \texttt{size} field, Korat would be forced to
+explore additional candidate structures, which it would have otherwise
+pruned from its search.  We conjecture such unaccounted field access
+could assist in developing different backtracking strategies, which
+for example modify more than one fields of a candidate during
+backtracking to perform more aggressive pruning.
 
 \begin{figure}
 \centering
-\begin{lstlisting}[language=Java]
-boolean repOK() {
+\begin{lstlisting}[language=Java,escapechar=|]
+boolean repOK() throws Exception{
     // checks that empty tree has size zero.
     if (root == null) return size == 0;
     Set visited = new HashSet();
@@ -189,17 +189,17 @@ boolean repOK() {
     while (!workList.isEmpty()) {
         Node current = (Node) workList.removeFirst();
         if (current.left != null) {
-            if (!visited.add(current.left)) return false;
+            if (!visited.add(current.left)) {
+                // Korat’s search is not affected by the following unaccounted access
+                System.out.println(“Cycle found at size : ” + (int)ReflectionUtils.unaccountedAccess(this,”size”));|\label{line:unacc_access}|
+                return false;
+            }
             workList.add(current.left);
         }
         if (current.right != null) {
             if (!visited.add(current.right)) return false;
             workList.add(current.right);
         }
-    }
-    // Korat’s search is not affected by the following access.
-    if(visited.size() != (int)ReflectionUtils.unaccountedAccess(this,”size”)){
-        System.out.println(“Size mismatch, need to change size”);
     }
     // checks that the size is consistent.
     return (visited.size() == size);
@@ -211,35 +211,25 @@ boolean repOK() {
 
 \section{Code reuse with reflection}
 \label{sec:code-reuse-with-reflection}
-In this section we present how using reflection can enable code reuse
-and avoid code bloat in \emph{RepOk} methods. Figure
-\ref{fig:btreeAcyclicRepOk} shows the implementation of a method that
-can be be used to check the acyclicity property of an object graph. A
-generic implemtation like \emph{checkAcyclic} can be reused to check
-the acyclicity of many recursive datastructures like BinaryTree,
-LinkedList, Graph etc. Figure \ref{fig:btreeAcyclicRepOk} also shows a
-\emph{RepOk} implementation for a BinaryTree that uses the
-\emph{checkAcyclic} method.
-
-\para Using reflection in \emph{RepOk} implementations allows code
-reuse and also reduces code bloat. Therefore it makes it easier to
-write a library of methods that can potentially help the programmer in
-writing \emph{RepOk} methods for complex data structures. Figure
-\ref{fig:libraryEvaluationTable}  presents a comparision between the number of valid
-structures output by Korat when the \emph{RepOk} methods use the
-\emph{checkAcyclicity(Object o)} method and don't use the method (from
-Korat distribution) to check if the object graph is acyclic. It was
-observed that both sets of implementations of \emph{RepOk} methods
-evaluate the same number of candidate structures and output the same
-number of valid structures. We observed a very negligible (less than
-0.1 seconds) execution time difference between the \emph{RepOk}
-implementations presented.
-
-
+The use of reflection for making field accesses enables writing
+re-usable checks for properties that are common across different data
+structures, e.g., acyclicity along all the reference fields can be
+written so that a singly-linked list RepOk and a binary tree RepOk
+could invoke the same acyclicity check.
+Figure~\ref{fig:btreeAcyclicRepOk} shows such a check for acyclicity.
+Any RepOk method that uses this re-usable check as a helper method can
+provide test input generation using our technique, which supports the
+use of reflection.  Table~\ref{fig:libraryEvaluationTable} shows the
+results for using the re-usable check for writing RepOk methods for
+three subject data structures, which are all acyclic.  For each
+structure, we tabulate the behavior of Korat search (1)~using
+dedicated RepOk for that structure as well as (2)~using the re-usable
+check.  The same numbers of candidates are explored and generated in
+both cases (as expected).
 \begin{figure}
 \centering
 \begin{lstlisting}[language=Java]
-private static Set checkAcyclic(Object obj){
+private static Set checkAcyclic(Object obj) throws Exception{
     Class<?> objClass = obj.getClass();
     Field[] objFields = objClass.getDeclaredFields();
     List<Field> matchingFields = new ArrayList<Field>();
@@ -264,7 +254,7 @@ private static Set checkAcyclic(Object obj){
     return visited;
 }
 
-boolean repOK() {
+boolean repOK() throws Exception{
     // checks that empty tree has size zero.
     if (root == null) return size == 0;
     // checks that the object graph is a tree.
@@ -273,21 +263,30 @@ boolean repOK() {
     return (nodeSet != null && nodeSet.size() == size);
 }
 \end{lstlisting}
-\caption{Binary tree example with RepOk using a generic checkAcyclic method written using reflection.}
+\caption{Binary tree example with RepOk using a re-usable check (checkAcyclic) written using reflection.}
 \label{fig:btreeAcyclicRepOk}
 \end{figure}
 
+The idea of re-usable checks was introduced in Marinov's dissertation,
+which describes dedicated generators that are library methods that
+allow users to (1)~directly specify structural properties without
+having the explicitly implement the corresponding checks; and
+(2)~achieve faster generation due to customized solving for those
+properties.  Our support for reflection allows the users to define
+re-usable checks simply using the standard Java reflection API and
+utilize the standard Korat algorithm.
 
 
 \begin{table}[h]
+\centering
 \begin{tabular}{|c|c|c|c|c|c|c|}
 \hline
- & \multicolumn{3}{c|}{\begin{tabular}[c]{@{}c@{}}\# of structures \\ explored/valid \\ without code reuse\end{tabular}} & \multicolumn{3}{c|}{\begin{tabular}[c]{@{}c@{}}\# of structures \\ explored/valid \\ with code reuse\end{tabular}} \\ \hline
-Scope size & 5 & 6 & 7 & 5 & 6 & 7 \\ \hline
-BinaryTree & \begin{tabular}[c]{@{}c@{}}1272/\\ 65\end{tabular} & \begin{tabular}[c]{@{}c@{}}4835/\\ 197\end{tabular} & \begin{tabular}[c]{@{}c@{}}18474/\\ 626\end{tabular} & \begin{tabular}[c]{@{}c@{}}1272/\\ 65\end{tabular} & \begin{tabular}[c]{@{}c@{}}4835/\\ 197\end{tabular} & \begin{tabular}[c]{@{}c@{}}18474/\\ 626\end{tabular} \\ \hline
-LinkedList & \begin{tabular}[c]{@{}c@{}}259/\\ 24\end{tabular} & \begin{tabular}[c]{@{}c@{}}974/\\ 76\end{tabular} & \begin{tabular}[c]{@{}c@{}}4147/\\ 279\end{tabular} & \begin{tabular}[c]{@{}c@{}}259/\\ 24\end{tabular} & \begin{tabular}[c]{@{}c@{}}974/\\ 76\end{tabular} & \begin{tabular}[c]{@{}c@{}}4147/\\ 279\end{tabular} \\ \hline
-SortedList & \begin{tabular}[c]{@{}c@{}}507/\\ 126\end{tabular} & \begin{tabular}[c]{@{}c@{}}2100/\\ 462\end{tabular} & \begin{tabular}[c]{@{}c@{}}9167/\\ 1716\end{tabular} & \begin{tabular}[c]{@{}c@{}}507/\\ 126\end{tabular} & \begin{tabular}[c]{@{}c@{}}2100/\\ 462\end{tabular} & \begin{tabular}[c]{@{}c@{}}9167/\\ 1716\end{tabular} \\ \hline
+ & \multicolumn{3}{c|}{\textit{\begin{tabular}[c]{@{}c@{}}\# of structures \\ explored/valid \\ using a \\ specialized RepOk\end{tabular}}} & \multicolumn{3}{c|}{\textit{\begin{tabular}[c]{@{}c@{}}\# of structures \\ explored/valid \\ using a \\ re-usable check\end{tabular}}} \\ \hline
+\textit{Scope size} & 5 & 6 & 7 & 5 & 6 & 7 \\ \hline
+\textit{BinaryTree} & \begin{tabular}[c]{@{}c@{}}1272/\\ 65\end{tabular} & \begin{tabular}[c]{@{}c@{}}4835/\\ 197\end{tabular} & \begin{tabular}[c]{@{}c@{}}18474/\\ 626\end{tabular} & \begin{tabular}[c]{@{}c@{}}1272/\\ 65\end{tabular} & \begin{tabular}[c]{@{}c@{}}4835/\\ 197\end{tabular} & \begin{tabular}[c]{@{}c@{}}18474/\\ 626\end{tabular} \\ \hline
+\textit{LinkedList} & \begin{tabular}[c]{@{}c@{}}259/\\ 24\end{tabular} & \begin{tabular}[c]{@{}c@{}}974/\\ 76\end{tabular} & \begin{tabular}[c]{@{}c@{}}4147/\\ 279\end{tabular} & \begin{tabular}[c]{@{}c@{}}259/\\ 24\end{tabular} & \begin{tabular}[c]{@{}c@{}}974/\\ 76\end{tabular} & \begin{tabular}[c]{@{}c@{}}4147/\\ 279\end{tabular} \\ \hline
+\textit{SortedList} & \begin{tabular}[c]{@{}c@{}}507/\\ 126\end{tabular} & \begin{tabular}[c]{@{}c@{}}2100/\\ 462\end{tabular} & \begin{tabular}[c]{@{}c@{}}9167/\\ 1716\end{tabular} & \begin{tabular}[c]{@{}c@{}}507/\\ 126\end{tabular} & \begin{tabular}[c]{@{}c@{}}2100/\\ 462\end{tabular} & \begin{tabular}[c]{@{}c@{}}9167/\\ 1716\end{tabular} \\ \hline
 \end{tabular}
-\caption{Number of valid structures generated by Korat when library for predicates is used in RepOk. All maximum finitization parameters are set to the size value.}
+\caption{Number of valid structures generated by Korat using specialized RepOk's and re-usable checks. All maximum finitization parameters are set to the size value.}
 \label{fig:libraryEvaluationTable}
 \end{table}

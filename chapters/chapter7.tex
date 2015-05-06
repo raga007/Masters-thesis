@@ -1,16 +1,31 @@
 \chapter{Related work}
 \label{ch:related-work}
-This chapter reviews the work related to improving Korat and static analysis. Section \ref{sec:attempts-to-improve-korat} discusses other projects that have improved different aspects of Korat. Section \ref{sec:related-static-analyses} discusses a few static program analysis tools that have tried to verify properties of datastructures.
+This chapter reviews the work related to improving Korat and static analysis. Section \ref{sec:attempts-to-improve-korat} discusses other projects that have improved different aspects of Korat. Section \ref{sec:related-static-analyses} discusses a few static program analysis tools that have tried to verify properties of data structures.
 
 \section{Attemps to improve Korat}
 \label{sec:attempts-to-improve-korat}
+Over the last decade, several project have tried to improve various
+aspects of Korat. Parallel test generation and execution with Korat
+\cite{...} talks about techniques to generate test inputs with a
+parallel search in Korat and techniques to execute test inputs in
+parallel, both off-line (when the inputs are saved on disk) and
+on-line (when execution immediately follows generation).PKorat
+\cite{...} improves on the previous work and explores the same state
+space as Korat but considers several candidates in each
+iteration. These candidates are distributed among parallel workers
+resulting in an efficient parallel version of Korat.
+
+
+% Systematic Software Testing: The Korat Approach
+
+
 
 \section{Static Analysis}
 \label{sec:related-static-analyses}
 Several projects have developed static analyses for verifying program
 properties. We will discuss some of the projects that check properties
 of complex data structures. The Extended Static Checker (ESC)
-\cite{flanagan2002extended} uses a theoram prover to verify partial correctness of Java
+\cite{flanagan2002extended} uses a theorem prover to verify partial correctness of Java
 classes annotated with JML specifications. ESC can find faults such as
 null pointer dereferences, array bounds violations and division by
 zero. The Three-Valued-Logic Analyzer (TVLA) \cite{sagiv2002parametric} was the first
@@ -24,7 +39,7 @@ reducing the amount of work that the user needs to do.
 \para Kuncak et al. proposed Role Analysis \cite{kuncak2002role}, a compositional
 interprocedual analysis that verifies similar properties like
 TVLA. The same authors also developed Hob \cite{lam2005generalized}, an analysis
-framework that combines different static analysis and theoram proving
+framework that combines different static analysis and theorem proving
 techniques \cite{zee2004combining} to show complex data structure consistency
 properties. The Pointer Assertion Logic Engine (PALE) \cite{moller2001pointer} can
 verify a large set of data structures that have a spanning tree
@@ -33,4 +48,5 @@ information. Jalloy \cite{jackson2000finding,vaziri2003checking} analyzes method
 structures by first building an alloy model of Java code and then
 checking it in a bounded-exhaustive manner with the Alloy Analyzer
 \cite{jackson2000alcoa}.
+
 

@@ -56,7 +56,7 @@ The main idea in \emph{constraint-based test input generation} is to
 represent the property of the desired test inputs as a constraint such
 that the solution to the constraint represents a test input. While
 there are several previous approaches for constraint-based input
-generation, most address porgram with inputs that are integers or
+generation, most address program with inputs that are integers or
 arrays of integers
 \cite{demilli1991constraint,huang1975approach,king1976symbolic,korel1996automated},
 or required constraints to be written in a declarative
@@ -76,7 +76,7 @@ structure represents a desired test input.
 
 \para Korat takes as an input a Java \emph{predicate} and a
 \emph{finitization} that bounds the size of the input structures to
-generate.  Korat outputs all valid \emph{nonisomorphic} structures
+generate.  Korat outputs all valid \emph{nonsmoker} structures
 within the given bounds. A finitization specifies upper bounds for the
 number of objects for different types in the structure and the
 possible values for the fields of these objects. Korat generates all
@@ -92,7 +92,7 @@ read all the reachable fields of a structure even after it is
 determined to be invalid before returning false, thereby forcing Korat
 to potentially backtrack much later than it would otherwise have if
 the predicate had returned false earlier (when fewer fields were
-accessed).  In chapter \ref{ch:shortcomings-of-korat}, we will see an
+accessed).  In Chapter~\ref{ch:shortcomings-of-korat}, we will see an
 example of this behavior.
 
 \section{Allowing the use of reflection in RepOk methods}
@@ -107,7 +107,7 @@ object fields using reflection, the original implementation of Korat
 does not have a way to observe those accesses.  Since Korat prunes its
 search by monitoring RepOk's field accesses, Korat's backtracking is
 affected by the use of reflection and Korat erroneously may not
-generate some valid structues.  We present a technique that builds on
+generate some valid structures.  We present a technique that builds on
 Korat to allow the use of reflection for field accesses by RepOk.
 
 \section{Static analysis to detect poorly written RepOk methods}
@@ -132,13 +132,13 @@ detail in Chapter~\ref{ch:static-analysis}.
   predicates, which may affect the performance of Korat;
 \item {\bf Implementation.} We embody our techniques into a prototype
   tool for Java; and
-\item {\bf Demonstration.} We demonstrate the uesfulness of our
+\item {\bf Demonstration.} We demonstrate the usefulness of our
   techniques using some well-studied data structures with complex
   structural constraints.
 \end{itemize}
 
 \section{Organization}
 \label{sec:organization-of-thesis}
-The remainder of this thesis is organized as follows. Chapter \ref{ch:shortcomings-of-korat} illustrates with examples, scenarios where Korat underperforms. Chapter \ref{ch:adding-reflection} talks about adding reflection to Korat. Chapter \ref{ch:static-analysis} presents a static analysis tool that can be used to validate a predicate written by the user. Chapter \ref{ch:evaluation} compares usage of predicates that use reflection and a predicate that does not use reflection, with Korat and shows how Korat performs when reflection is not supported. Chapter \ref{ch:related-work} discusses other approaches that people have used to improve Korat and chapter \ref{ch:future-work} concludes the thesis with some future work.
+The remainder of this thesis is organized as follows. Chapter~\ref{ch:shortcomings-of-korat} illustrates with examples, scenarios where Korat under performs. Chapter~\ref{ch:adding-reflection} talks about adding reflection to Korat. Chapter~\ref{ch:static-analysis} presents a static analysis tool that can be used to validate a predicate written by the user. Chapter~\ref{ch:evaluation} compares usage of predicates that use reflection and a predicate that does not use reflection, with Korat and shows how Korat performs when reflection is not supported. Chapter~\ref{ch:related-work} discusses other approaches that people have used to improve Korat and Chapter~\ref{ch:conclusion-and-future-work} concludes the thesis with some future work.
 
 %Chapter \ref{ch:library-for-predicates} presents a small library that can be used for code reuse in predicates.
