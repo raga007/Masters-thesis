@@ -5,45 +5,74 @@ This chapter reviews the work related to improving Korat and static analysis. Se
 \section{Attemps to improve Korat}
 \label{sec:attempts-to-improve-korat}
 Over the last decade, several projects have tried to improve various
-aspects of Korat. Parallel test generation and execution with Korat
-\cite{misailovic2007parallel} talks about techniques to generate test inputs with a
-parallel search in Korat and techniques to execute test inputs in
-parallel, both off-line (when the inputs are saved on disk) and
-on-line (when execution immediately follows generation).PKorat
-\cite{siddiqui2009pkorat} improves on the previous work and explores the same state
-space as Korat but considers several candidates in each
-iteration. These candidates are distributed among parallel workers
-resulting in an efficient parallel version of Korat.
+aspects of Korat. Parallel test generation and execution with
+Korat~\cite{misailovic2007parallel} presents algorithms to generate
+test inputs with a parallel search in Korat and techniques to execute
+test inputs in parallel, both off-line (when the inputs are saved on
+disk) and on-line (when execution immediately follows
+generation). PKorat~\cite{siddiqui2009pkorat} improves on this work,
+explores the same state space as Korat but considers several
+candidates in each iteration. These candidates are distributed among
+parallel workers resulting in an efficient parallel version of
+Korat. Parallel test generation and execution with Korat is designed
+for clusters comprising largely independant machines and it randomly
+divides work between these machines.  On the other hand, PKorat
+systematically divides work for and it is primarily designed for high
+bandwidth clusters.
 
+The principle idea of Korat has been used in other applications. In
+particular, STARC~\cite{elkarablieh2007starc} uses the Korat algorithm
+to repair huge complex structures by running the algorithm in
+neighborhood of the defective structure. Glass box
+testing~\cite{darga2006efficient} uses the method to be tested to
+prune Korat’s generation. Thus it moves away from the pure black-box
+approach of Korat.
+
+Instead of running \emph{RepOk} from the start for
+every candidate, efficient backtracking optimization
+\cite{elkarablieh2008efficient} can undo operations done in last
+execution and proceed from that point for the next candidate. This has
+shown improvements for STARC and also for
+Korat. Multi-Korat~\cite{siddiqui2012lightweight} uses a lightweight
+static data-flow analysis and performs multi-value comparisions in the
+candidate structure to \emph{forward} predicate executions on
+candidate inputs that are similar. Multi-Korat is centered around
+reducing the number of \emph{RepOk} executions to produce all test
+cases.
 
 
 \section{Static Analysis}
 \label{sec:related-static-analyses}
 Several projects have developed static analyses for verifying program
 properties. We will discuss some of the projects that check properties
-of complex data structures. The Extended Static Checker (ESC)
-\cite{flanagan2002extended} uses a theorem prover to verify partial correctness of Java
-classes annotated with JML specifications. ESC can find faults such as
-null pointer dereferences, array bounds violations and division by
-zero. The Three-Valued-Logic Analyzer (TVLA) \cite{sagiv2002parametric} was the first
-system to implement a shape analysis, which verifies that programs
-with destructive updates preserve structural invariants of linked data
-structures. There has been work \cite{yorsh2004symbolically}  that extends TVLA to
-handle more properties of the content of the data structures and uses
-symbolic computation to automatically derive transfer functions, thus
-reducing the amount of work that the user needs to do.
+of complex data structures. The Extended Static Checker
+(ESC)~\cite{flanagan2002extended} uses a theorem prover to verify
+partial correctness of Java classes annotated with JML
+specifications. ESC can find faults such as null pointer dereferences,
+array bounds violations and division by zero. The Three-Valued-Logic
+Analyzer (TVLA)~\cite{sagiv2002parametric} was the first system to
+implement a shape analysis, which verifies that programs with
+destructive updates preserve structural invariants of linked data
+structures. There has been work~\cite{yorsh2004symbolically} that
+extends TVLA to handle more properties of the content of the data
+structures and uses symbolic computation to automatically derive
+transfer functions, thus reducing the amount of work that the user
+needs to do.
 
-\para Kuncak et al. proposed Role Analysis \cite{kuncak2002role}, a compositional
-interprocedual analysis that verifies similar properties like
-TVLA. The same authors also developed Hob \cite{lam2005generalized}, an analysis
-framework that combines different static analysis and theorem proving
-techniques \cite{zee2004combining} to show complex data structure consistency
-properties. The Pointer Assertion Logic Engine (PALE) \cite{moller2001pointer} can
-verify a large set of data structures that have a spanning tree
-backbone, with possibly additional pointers that do not add extra
-information. Jalloy \cite{jackson2000finding,vaziri2003checking} analyzes methods that manipulate linked data
-structures by first building an alloy model of Java code and then
-checking it in a bounded-exhaustive manner with the Alloy Analyzer
+\para Kuncak et al. proposed Role Analysis~\cite{kuncak2002role}, a
+compositional interprocedual analysis that verifies similar properties
+like TVLA. The same authors also developed
+Hob~\cite{lam2005generalized}, an analysis framework that combines
+different static analysis and theorem proving
+techniques~\cite{zee2004combining} to show complex data structure
+consistency properties. The Pointer Assertion Logic Engine
+(PALE)~\cite{moller2001pointer} can verify a large set of data
+structures that have a spanning tree backbone, with possibly
+additional pointers that do not add extra
+information. Jalloy~\cite{jackson2000finding,vaziri2003checking}
+analyzes methods that manipulate linked data structures by first
+building an alloy model of Java code and then checking it in a
+bounded-exhaustive manner with the Alloy Analyzer
 \cite{jackson2000alcoa}.
 
 
