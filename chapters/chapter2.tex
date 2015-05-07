@@ -4,29 +4,29 @@ This chapter presents two example scenarios where
 Korat fails to perform as expected.  The first
 example shows how the use of reflection for field accesses may render
 Korat unable to generate some valid structures.  The second example
-shows how a poorly-written RepOk may adversely affect the performance
+shows how a poorly-written \emph{RepOk} may adversely affect the performance
 of Korat and force it to explore many more states than necessary.
 Both examples use a binary tree data structure and implement different
-RepOk methods that check the same set of properties but operate
-differently.  We compare the performance of Korat by using these RepOk
+\emph{RepOk} methods that check the same set of properties but operate
+differently.  We compare the performance of Korat by using these \emph{RepOk}
 methods against using the standard binary tree RepOk from Korat
 distribution.  Chapter~\ref{ch:evaluation} provides experimental
 results using additional data structures.
 
 \section{Usage of reflection for field access}
 \label{sec:usage-of-reflection-for-field-access}
-This example first illustrates how a RepOk method can be written with
+This example first illustrates how a \emph{RepOk} method can be written with
 and without using reflection for field accesses and then shows how the
 output of Korat differs in terms of the sets of valid structures
 generated.
 
 \para
 Figure~\ref{fig:btreeDirectRepOk} shows the Java declaration of a
-binary tree and a standard implementation of its RepOk
+binary tree and a standard implementation of its \emph{RepOk}
 method\footnote{\url{korat.sourceforge.net}}. Each object of the class
 \emph{BinaryTree} represents a binary tree. The value of the
 \emph{size} field is the number of nodes in the tree. Objects of the
-inner class \emph{Node} represent nodes of the tree.  The RepOk method
+inner class \emph{Node} represent nodes of the tree.  The \emph{RepOk} method
 performs a traversal of its input object graph and checks that it has
 no cycle and the value of the size field is correctly set to the
 actual number of nodes reachable from root.  In more detail, first,
@@ -115,16 +115,16 @@ each structure using a \emph{candidate vector}, which represents the
 \emph{state} of Korat's backtracking search; the finitization defines
 the \emph{bounded state space}.  For each candidate that Korat
 explores, it translates the candidate to a Java object graph and
-invokes RepOk on the resulting object.  Korat monitors these
+invokes \emph{RepOk} on the resulting object.  Korat monitors these
 executions to dynamically determine which fields of the candidate are
-accessed by RepOk before returning its result.  Korat monitors field
+accessed by \emph{RepOk} before returning its result.  Korat monitors field
 accesses by using bytecode instrumentation to replace them with
 accessor methods that notify an observer of the accesses. If the
 predicate returns \emph{true}, Korat outputs the candidate as a valid
 structure for testing. Otherwise, if the predicate returns false,
 Korat does not output the candidate.  When RepOk terminates, Korat
 creates the next candidate based on the fields accessed during the
-RepOk's last execution.  Specifically, Korat tries the next value for
+\emph{RepOk's} last execution.  Specifically, Korat tries the next value for
 the last field accessed (based on the time of first access) to
 systematically explore the state space.  Backtracking based on last
 field access allows Korat to prune effectively; moreover Korat defines
@@ -176,14 +176,14 @@ boolean repOK() throws Exception{
 \end{figure}
 
 Figure~\ref{fig:btreeDirectRepOk} illustrates the use of reflection
-for field access.  Specifically, it shows the same RepOk property
+for field access.  Specifically, it shows the same \emph{RepOk} property
 check as Figure~\ref{fig:btreeDirectRepOk} but with the use of
 reflection: field access of left field of the node removed from the
 \emph{workList} is using the Java reflection API instead of direct
 field de-referencing.  The use of reflection renders Korat unable to
 monitor the corresponding field(s) since Korat's monitoring is based
 on actual field accesses (using \texttt{GETFIELD} bytecode
-operations).  Given this reflection-based RepOk
+operations).  Given this reflection-based \emph{RepOk}
 (Figure~\ref{fig:btreeDirectRepOk}), Korat evaluates only 28
 non-isomorphic candidate structures of which 5 structures are output,
 which are valid since they satisfy the \emph{RepOk};
@@ -191,14 +191,14 @@ Figure~\ref{fig:btreeReflectKoratGenScopeThree} illustrates these 5
 structures.  Thus, the use of reflection reduces (1)~the state space
 Korat explores simply because Korat is unable to create the \emph{data
   choices} appropriately and (2)~the number of valid candidates.  Note
-however, since Korat never generates a candidate for which RepOk
+however, since Korat never generates a candidate for which \emph{RepOk}
 returns false, Korat only generates valid candidates even if
 reflection is used.  Thus, reflection compromises completeness of
 Korat's search (but not the soundness of the outputs generated).  Note
-since the use of reflection may result in an exception, the RepOk in
+since the use of reflection may result in an exception, the \emph{RepOk} in
 Figure~\ref{fig:btTreeReflectionRepOK} has a \texttt{throws} declaration.
 
-RepOk methods may use helper methods.  Korat instruments all the
+\emph{RepOk} methods may use helper methods.  Korat instruments all the
 helper methods, so it can monitor any fields they access.  However, as
 before, if any helper method uses reflection, Korat cannot monitor
 those accesses.
@@ -208,11 +208,11 @@ those accesses.
 
 Korat's pruning is sensitive to the way RepOk is written because
 Korat's backtracking depends directly on the field accesses made by
-RepOk.  Thus, a poorly written RepOk, e.g., one that accesses all
+\emph{RepOk}.  Thus, a poorly written \emph{RepOk}, e.g., one that accesses all
 (reachable) fields regardless of whether the current structure is
 already determined to be valid or invalid, may force Korat to consider
 a very large number of candidate structures and perform poorly.  Note
-that such poorly written RepOk's do not force Korat to generate
+that such poorly written \emph{RepOk's} do not force Korat to generate
 incorrect an incorrect result, rather they degrade its performance.
 
 \begin{figure}
@@ -252,7 +252,7 @@ boolean repOK() {
 \end{figure}
 
 A standard guideline to increase Korat's efficiency is to write a
-RepOk that \emph{short-circuits} when possible, e.g., returns result
+\emph{RepOk} that \emph{short-circuits} when possible, e.g., returns result
 as soon as it is known.  Indeed, there can be significant
 performance difference between a poorly-written and an optimized RepOk
 as we illustrate next.

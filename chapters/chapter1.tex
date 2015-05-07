@@ -3,39 +3,39 @@
 Testing plays a vital role in developing reliable systems. However,
 testing manually is expensive and tedious. Researchers have long
 recognized the benefits of using specifications in automated
-testing~\cite{...}. While the initial use of specifications was
-largely in academic settings, the last fifteen years have seen much
-progress in developing tools that can make use of specifications to
-test real applications, e.g., by generating test inputs automatically
-using constraint solving
+testing~\cite{boyapati2002korat,demilli1991constraint,gotlieb1998automatic,howden1977symbolic,huang1975approach,king1976symbolic,korel1996automated,marinov2001testera,khurshid2003generalized,sen2005cute,godefroid2005dart}. While
+the initial use of specifications was largely in academic settings,
+the last fifteen years have seen much progress in developing tools
+that can make use of specifications to test real applications, e.g.,
+by generating test inputs automatically using constraint solving
 \cite{demilli1991constraint,gotlieb1998automatic,howden1977symbolic,huang1975approach,king1976symbolic,korel1996automated,legeard2002automated,marinov2001testera}.
 
 \para The focus of our work is test input generation using imperative
 predicates, which was introduced by the \emph{Korat} approach
 \cite{boyapati2002korat}. Korat takes a given Java method, called
-\emph{repOk}, that returns a \emph{boolean} method, and systematically
+\emph{RepOk}, that returns a \emph{boolean} method, and systematically
 explores the input space of the predicate to enumerate inputs for
-which \emph{repOk} returns \emph{true}. The focus of Korat’s
+which \emph{RepOk} returns \emph{true}. The focus of Korat’s
 generation is structurally complex data, e.g., recursive data
 structures allocated on the program heap. The input spaces to explore
 for such recursive structures are often huge.  Korat performs a
 bounded exploration defined by a \emph{finitization} given by the user
 to bound the input size. Korat efficiently prunes the space of
-candidate inputs for the \emph{repOk} method by executing it on
-candidate inputs and monitoring the object fields that \emph{repOk}
+candidate inputs for the \emph{RepOk} method by executing it on
+candidate inputs and monitoring the object fields that \emph{RepOk}
 accesses in deciding if the properties are satisfied. Moreover, Korat
 prunes from search candidates that are isomorphic to any candidate
 already evaluated, thereby further reducing the number of candidates
 to consider by a considerable factor.
 
 \para While Korat generates inputs effectively, its correctness and
-efficiency rely on two assumptions about the \emph{repOk} methods.
-For correctness, Korat assumes the \emph{repOk} methods do not use the
+efficiency rely on two assumptions about the \emph{RepOk} methods.
+For correctness, Korat assumes the \emph{RepOk} methods do not use the
 Java reflection API for field accesses; the use of reflection renders
 Korat unable to enumerate all desired inputs.  For efficiency, Korat
-assumes the \emph{repOk} methods are written such that they only
+assumes the \emph{RepOk} methods are written such that they only
 access fields that are necessary to check the properties; the use of
-unnecessary field accesses by \emph{repOk} renders Korat's pruning
+unnecessary field accesses by \emph{RepOk} renders Korat's pruning
 ineffective.
 
 \para
@@ -85,7 +85,7 @@ defined by the finitization. Korat prunes the search space by
 monitoring the execution of the predicate on each candidate structure
 considered and determining the fields of the structure accessed by the
 predicate before it returns the result. For exhaustive generation,
-Korat backtracks on the last field that is accessed by RepOk.  The
+Korat backtracks on the last field that is accessed by \emph{RepOk}.  The
 efficiency of Korat's pruning is sensitive to the way the imperative
 predicate is written. For example, an ill-written predicate may always
 read all the reachable fields of a structure even after it is
@@ -102,20 +102,20 @@ introspection of a Java program.  The Java reflection API makes it
 possible to inspect classes, interfaces, fields and methods at
 runtime, without knowing the names of the classes, methods etc. at
 compile time. It also allows instantiating new objects, invoking
-methods and getting/setting field values.  If the RepOk accesses
+methods and getting/setting field values.  If the \emph{RepOk} accesses
 object fields using reflection, the original implementation of Korat
 does not have a way to observe those accesses.  Since Korat prunes its
-search by monitoring RepOk's field accesses, Korat's backtracking is
+search by monitoring \emph{RepOk's} field accesses, Korat's backtracking is
 affected by the use of reflection and Korat erroneously may not
 generate some valid structures.  We present a technique that builds on
-Korat to allow the use of reflection for field accesses by RepOk.
+Korat to allow the use of reflection for field accesses by \emph{RepOk}.
 
 \section{Static analysis to detect poorly written RepOk methods}
 \label{sec:static-analysis-poorly-written-repok}
-Since the effectiveness of Korat's pruning relies heavily on RepOk's
-field accesses, a poorly written RepOk may render Korat impractical to
+Since the effectiveness of Korat's pruning relies heavily on \emph{RepOk's}
+field accesses, a poorly written \emph{RepOk} may render Korat impractical to
 use.  We present a static analysis, namely \emph{def-use} analysis,
-that detects a certain pattern for poorly written RepOk's.  Our tool
+that detects a certain pattern for poorly written \emph{RepOk's}.  Our tool
 RepOkValidator implements the analysis, which is described in more
 detail in Chapter~\ref{ch:static-analysis}.
 
@@ -126,7 +126,7 @@ detail in Chapter~\ref{ch:static-analysis}.
 \begin{itemize}
 \item {\bf Support for reflection in Korat.}  We present a technique
   that builds on Korat to support the use of Java reflection API for
-  field accesses in RepOk predicates;
+  field accesses in \emph{RepOk} predicates;
 \item {\bf Static analysis of RepOk predicates.} We present a static
   analysis to identify potentially unnecessary field accesses in RepOk
   predicates, which may affect the performance of Korat;

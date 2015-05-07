@@ -1,10 +1,10 @@
 \chapter{Supoport for reflection in Korat}
 \label{ch:adding-reflection}
 This chapter presents our technique for adding support for reflection
-in Korat so that users can write RepOk methods that may use the Java
+in Korat so that users can write \emph{RepOk} methods that may use the Java
 reflection API for accessing object fields.  Moreover, we discuss how
 to allow users to exclude certain field accesses from being monitored,
-as well as how to support them more easily write RepOk methods.
+as well as how to support them more easily write \emph{RepOk} methods.
 
 Recall from section \ref{sec:usage-of-reflection-for-field-access} of
 Chapter~\ref{ch:shortcomings-of-korat}, the use of reflection for
@@ -26,7 +26,7 @@ users to exclude certain field accesses from being monitored; we term
 such access an \emph{unaccounted field access}; such accesses are
 useful, for example, to log desired field values.  In
 Section~\ref{sec:code-reuse-with-reflection} we discuss how the use of
-reflection can provide code re-use for writing parts of RepOk methods.
+reflection can provide code re-use for writing parts of \emph{RepOk} methods.
 
 \section{Instrumentation of field accesses}
 \label{sec:instrumentation-of-field-accesses}
@@ -64,9 +64,10 @@ field based on the method (setter/getter) invoked.
 \centering
 \begin{lstlisting}[language=Java]
 class BinaryTree {
-    korat.Observer korat_observer;  // observer for this object
+    // observer for this object
+    korat.Observer korat_observer;
     // special constructor to initialize the observer and field ids
-    BinaryTree( korat.Observer observer, korat.Ids id) {
+    BinaryTree(korat.Observer observer, korat.Ids id){
         korat_observer = observer;
         korat_id_root = id.getNextId();
         korat_id_size = id.getNextId();
@@ -117,14 +118,14 @@ accesses using the Java reflection API and in addition also notify
 Korat of the particular accesses.  Our basic algorithm to support
 reflection has two steps:
 \begin{enumerate}
-\item Bytecode instrumentation of RepOk to performs all the steps of
+\item Bytecode instrumentation of \emph{RepOk} to performs all the steps of
   Korat's original instrumentation and in addition replace invocations
   of \texttt{get} methods from Java reflection API with invocations of
   our library methods; and
-\item Execution of Korat on the resulting RepOk.
+\item Execution of Korat on the resulting \emph{RepOk}.
 \end{enumerate}
 
-Figure~\ref{fig:fieldClassInstrumentationMethods} shows how our
+Table~\ref{fig:fieldClassInstrumentationMethods} shows how our
 technique replaces the invocations of Java reflection API methods with
 invocations of our library methods.  Each of our library methods
 notifies the corresponding \emph{korat\_observer} (introduced during
@@ -154,7 +155,7 @@ instrumentation) about the field accessed.
 
 \section{Unaccounted field accesses}
 \label{ch:unaccounted-field-accesses}
-To provide flexibility in writing RepOk methods, specifically to
+To provide flexibility in writing \emph{RepOk} methods, specifically to
 support methods that may make some field accesses for logging
 information purposes rather than for directly determining the input's
 validity, our library provides a special method
@@ -190,14 +191,16 @@ boolean repOK() throws Exception{
         Node current = (Node) workList.removeFirst();
         if (current.left != null) {
             if (!visited.add(current.left)) {
-                // Korat’s search is not affected by the following unaccounted access
+                // Korat’s search is not affected by
+                // the following unaccounted access
                 System.out.println(“Cycle found at size : ” + (int)ReflectionUtils.unaccountedAccess(this,”size”));|\label{line:unacc_access}|
                 return false;
             }
             workList.add(current.left);
         }
         if (current.right != null) {
-            if (!visited.add(current.right)) return false;
+            if (!visited.add(current.right)) 
+                return false;
             workList.add(current.right);
         }
     }
@@ -214,25 +217,16 @@ boolean repOK() throws Exception{
 The use of reflection for making field accesses enables writing
 re-usable checks for properties that are common across different data
 structures, e.g., acyclicity along all the reference fields can be
-written so that a singly-linked list RepOk and a binary tree RepOk
+written so that a singly-linked list \emph{RepOk} and a binary tree \emph{RepOk}
 could invoke the same acyclicity check.
-Figure~\ref{fig:btreeAcyclicRepOk} shows such a check for acyclicity.
-Any RepOk method that uses this re-usable check as a helper method can
-provide test input generation using our technique, which supports the
-use of reflection.  Table~\ref{fig:libraryEvaluationTable} shows the
-results for using the re-usable check for writing RepOk methods for
-three subject data structures, which are all acyclic.  For each
-structure, we tabulate the behavior of Korat search (1)~using
-dedicated RepOk for that structure as well as (2)~using the re-usable
-check.  The same numbers of candidates are explored and generated in
-both cases (as expected).
+
 \begin{figure}
 \centering
 \begin{lstlisting}[language=Java]
 private static Set checkAcyclic(Object obj) throws Exception{
     Class<?> objClass = obj.getClass();
     Field[] objFields = objClass.getDeclaredFields();
-    List<Field> matchingFields = new ArrayList<Field>();
+   List<Field> matchingFields = new ArrayList<Field>();
     for(Field field : objFields){
         if(field.getType().equals(objClass)){
             matchingFields.add(field);
@@ -267,6 +261,19 @@ boolean repOK() throws Exception{
 \label{fig:btreeAcyclicRepOk}
 \end{figure}
 
+\para
+Figure~\ref{fig:btreeAcyclicRepOk} shows such a check for acyclicity.
+Any \emph{RepOk} method that uses this re-usable check as a helper method can
+provide test input generation using our technique, which supports the
+use of reflection.  Table~\ref{fig:libraryEvaluationTable} shows the
+results for using the re-usable check for writing \emph{RepOk} methods for
+three subject data structures, which are all acyclic.  For each
+structure, we tabulate the behavior of Korat search (1)~using
+dedicated \emph{RepOk} for that structure as well as (2)~using the re-usable
+check.  The same numbers of candidates are explored and generated in
+both cases (as expected).
+
+\para
 The idea of re-usable checks was introduced in Marinov's dissertation,
 which describes dedicated generators that are library methods that
 allow users to (1)~directly specify structural properties without
@@ -284,8 +291,8 @@ utilize the standard Korat algorithm.
  & \multicolumn{3}{c|}{\textit{\begin{tabular}[c]{@{}c@{}}\# of structures \\ explored/valid \\ using a \\ specialized RepOk\end{tabular}}} & \multicolumn{3}{c|}{\textit{\begin{tabular}[c]{@{}c@{}}\# of structures \\ explored/valid \\ using a \\ re-usable check\end{tabular}}} \\ \hline
 \textit{Scope size} & 5 & 6 & 7 & 5 & 6 & 7 \\ \hline
 \textit{BinaryTree} & \begin{tabular}[c]{@{}c@{}}1272/\\ 65\end{tabular} & \begin{tabular}[c]{@{}c@{}}4835/\\ 197\end{tabular} & \begin{tabular}[c]{@{}c@{}}18474/\\ 626\end{tabular} & \begin{tabular}[c]{@{}c@{}}1272/\\ 65\end{tabular} & \begin{tabular}[c]{@{}c@{}}4835/\\ 197\end{tabular} & \begin{tabular}[c]{@{}c@{}}18474/\\ 626\end{tabular} \\ \hline
-\textit{LinkedList} & \begin{tabular}[c]{@{}c@{}}259/\\ 24\end{tabular} & \begin{tabular}[c]{@{}c@{}}974/\\ 76\end{tabular} & \begin{tabular}[c]{@{}c@{}}4147/\\ 279\end{tabular} & \begin{tabular}[c]{@{}c@{}}259/\\ 24\end{tabular} & \begin{tabular}[c]{@{}c@{}}974/\\ 76\end{tabular} & \begin{tabular}[c]{@{}c@{}}4147/\\ 279\end{tabular} \\ \hline
-\textit{SortedList} & \begin{tabular}[c]{@{}c@{}}507/\\ 126\end{tabular} & \begin{tabular}[c]{@{}c@{}}2100/\\ 462\end{tabular} & \begin{tabular}[c]{@{}c@{}}9167/\\ 1716\end{tabular} & \begin{tabular}[c]{@{}c@{}}507/\\ 126\end{tabular} & \begin{tabular}[c]{@{}c@{}}2100/\\ 462\end{tabular} & \begin{tabular}[c]{@{}c@{}}9167/\\ 1716\end{tabular} \\ \hline
+\textit{SinglyLinkedList} & \begin{tabular}[c]{@{}c@{}}51/\\ 6\end{tabular} & \begin{tabular}[c]{@{}c@{}}70/\\ 7\end{tabular} & \begin{tabular}[c]{@{}c@{}}92/\\ 8\end{tabular} & \begin{tabular}[c]{@{}c@{}}51/\\ 6\end{tabular} & \begin{tabular}[c]{@{}c@{}}70/\\ 7\end{tabular} & \begin{tabular}[c]{@{}c@{}}92/\\ 8\end{tabular} \\ \hline
+\textit{SortedList} & \begin{tabular}[c]{@{}c@{}}891/\\ 252\end{tabular} & \begin{tabular}[c]{@{}c@{}}4030/\\ 924\end{tabular} & \begin{tabular}[c]{@{}c@{}}18110/\\ 3432\end{tabular} & \begin{tabular}[c]{@{}c@{}}891/\\ 252\end{tabular} & \begin{tabular}[c]{@{}c@{}}4030/\\ 924\end{tabular} & \begin{tabular}[c]{@{}c@{}}18110/\\ 3432\end{tabular} \\ \hline
 \end{tabular}
 \caption{Number of valid structures generated by Korat using specialized RepOk's and re-usable checks. All maximum finitization parameters are set to the size value.}
 \label{fig:libraryEvaluationTable}
