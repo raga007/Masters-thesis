@@ -15,7 +15,7 @@ candidate inputs for the \emph{RepOk} method by executing it on
 candidate inputs and monitoring the object fields that \emph{RepOk}
 accesses in deciding if the properties are satisfied.  While Korat
 generates inputs effectively, its correctness and efficiency rely on
-two assumptions about the repOk methods.  For correctness, Korat
+two assumptions about the \emph{RepOk} methods.  For correctness, Korat
 assumes the \emph{RepOk} methods do not use the Java reflection API
 for field accesses; the use of reflection renders Korat unable to
 enumerate all desired inputs.  For efficiency, Korat assumes the
@@ -47,7 +47,7 @@ develop more effective \emph{RepOk} methods.
 \para \textbf{Reflection instrumentation.}
 Chapter~\ref{ch:adding-reflection} presented our technique that builds
 on Korat to support the usage of reflection; however, our current
-protoype tool implementation requires manually transforming the calls
+prototype tool implementation requires manually transforming the calls
 to Java reflection API to our own reflection API (which mimics the
 Java reflection API but also notifies Korat of field accesses).  An
 additional simple engineering step that replaces calls to Java

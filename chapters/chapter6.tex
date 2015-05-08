@@ -14,8 +14,6 @@ Intel core i7 processor using Sun’s Java 6 SDK 1.6.0 JVM.
 
 \section{Benchmarks}
 \label{sec:benchmarks}
-
-\para
 The following list summarizes our subject data structures: 
 \begin{itemize}
 \item BinaryTree -- acyclic, binary trees with size field;
@@ -25,8 +23,8 @@ The following list summarizes our subject data structures:
 \item SortedList -- acyclic, singly-linked list with size field and
   integer elements in sorted order.
 \end{itemize}
-Table~\ref{fig:benchmarksAndFinitizationParams} lists the finitization parameters for each subject.
 
+Table~\ref{fig:benchmarksAndFinitizationParams} lists the finitization parameters for each subject.
 
 \begin{table}[h]
 \resizebox{\columnwidth}{!}{\begin{tabular}{|c|c|}
@@ -50,9 +48,7 @@ generates structures of upto the given \emph{size}. We set the
 
 \section{Generation of valid structures}
 \label{sec:generation-of-valid-structures}
-
-\par
-\noindent The following list describes the various kinds of RepOk
+\noindent The following list describes the various kinds of \emph{RepOk}
 methods we use for evaluation:
 \begin{itemize}
 \item No reflection -- standard \emph{RepOk} implementation (from the
@@ -60,14 +56,14 @@ methods we use for evaluation:
   any of the field accesses;
 \item Reflection for \emph{root/header} field access -- \emph{RepOk}
   uses reflection only to access the \emph{root/header} field, which
-  is typically accessed during the initial part of a RepOk's
+  is typically accessed during the initial part of a \emph{RepOk's}
   execution;
 \item Reflection for \emph{size} field access -- \emph{RepOk} uses
   reflection only to access the \emph{size} field, which is typically
-  accessed during the final part of a RepOk's execution; and
+  accessed during the final part of a \emph{RepOk's} execution; and
 \item Reflection for a \emph{recursive} field access -- \emph{RepOk}
   uses reflection only to access a \emph{recursive} field, which is
-  typically accessed multiple times by RepOk.
+  typically accessed multiple times by \emph{RepOk}.
 \end{itemize}
 
 For a range of sizes and four different \emph{RepOk} implementations,
@@ -84,26 +80,12 @@ expected since the Korat search is no longer able to create the search
 space correctly based on the field that Korat can no longer monitor.
 Likewise, the number of structures explored is also reduced when
 reflection is used.
-\Comment{
- is affected differently when reflection is used to access
-different fields. 
 
-
-In cases where reflection is used to access a field early in the
-\emph{RepOk}, the Korat search terminates in under a second and
-outputs up to 2 valid structures for the given scopes. In the
-\emph{RepOk} where the \emph{size} field accessed using reflection,
-Korat evaluates a significantly higher number of candidate structures
-but, only outputs very few valid structures. This shows how the Korat
-search is affected differently based on the field accessed using
-reflection. 
-}
 Using our technique to support reflection
 (Chapter~\ref{ch:adding-reflection}), the standard Korat algorithm is
 able to generate exactly the expected number of valid structures and
 also explore exactly the expected number of candidate structures in
-each case as the original RepOk that does not use reflection.
-
+each case as the original \emph{RepOk} that does not use reflection.
 
 \begin{table}[h]
 \centering
@@ -125,16 +107,16 @@ each case as the original RepOk that does not use reflection.
 
 \section{Performance of Inefficient predicates}
 \label{sec:performance-of-inefficient-predicates}
-
-This section describes how poorly written RepOk's can influence
+This section describes how poorly written \emph{RepOk's} can influence
 Korat's performance.  Specifically, for each of our 4 subject data
-structures, we create a RepOk that does not return its result as soon
+structures, we create a \emph{RepOk} that does not return its result as soon
 it is determined (e.g., when a property violation is established) and
 continues to make extraneous field accesses.  All these poorly written
-RepOk's follow the structure of the RepOk shown in Figure~\ref{...},
-where a boolean field is used to keep track of each property and the
-field is set to false when the property is found to be false instead
-of returning false immediately.
+\emph{RepOk's} follow the structure of the \emph{RepOk} shown in
+Figure~\ref{fig:repOkMultipleBooleanVariables}, where a boolean field
+is used to keep track of each property and the field is set to false
+when the property is found to be false instead of returning false
+immediately.
 
 % This table has been revised and every value has been verified
 \begin{table}[h]
@@ -151,12 +133,12 @@ of returning false immediately.
 \label{fig:peformanceResultsTable}
 \end{table}
 
-Table~\ref{...} tabulates the experimental results.  In all cases,
-using the poorly-written RepOk, Korat generates exactly the expected
-number of valid structures, so the output is correct, but the search
-space explored is substantially larger than that using the
-short-circuiting RepOk.  For example, for binary tree with size 6, the
-number of structures explored increases many-fold even though the
-number of valid structures generated stays the same.  Likewise, the
-time to explore using poorly-written RepOk's is also significantly
-larger.
+Table~\ref{fig:peformanceResultsTable} tabulates the experimental
+results.  In all cases, using the poorly-written \emph{RepOk}, Korat
+generates exactly the expected number of valid structures, so the
+output is correct, but the search space explored is substantially
+larger than that using the short-circuiting \emph{RepOk}.  For
+example, for binary tree with size 6, the number of structures
+explored increases many-fold even though the number of valid
+structures generated stays the same.  Likewise, the time to explore
+using poorly-written \emph{RepOk's} is also significantly larger.
