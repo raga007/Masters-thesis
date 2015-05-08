@@ -1,6 +1,11 @@
 \chapter{Related work}
 \label{ch:related-work}
-This chapter reviews the work related to improving Korat and static analysis. Section \ref{sec:attempts-to-improve-korat} discusses other projects that have improved different aspects of Korat. Section \ref{sec:related-static-analyses} discusses a few static program analysis tools that have tried to verify properties of data structures.
+This chapter reviews the work related to improving Korat and static
+analysis. Section \ref{sec:attempts-to-improve-korat} discusses other
+projects that have improved different aspects of Korat. Section
+\ref{sec:related-static-analyses} discusses a few static program
+analysis tools that have tried to verify properties of data
+structures.
 
 \section{Attemps to improve Korat}
 \label{sec:attempts-to-improve-korat}
@@ -28,13 +33,18 @@ testing~\cite{darga2006efficient} uses the method to be tested to
 prune Korat’s generation. Thus it moves away from the pure black-box
 approach of Korat.
 
-Instead of running \emph{RepOk} from the start for
-every candidate, efficient backtracking optimization
-\cite{elkarablieh2008efficient} can undo operations done in last
-execution and proceed from that point for the next candidate. This has
-shown improvements for STARC and also for
-Korat. Multi-Korat~\cite{siddiqui2012lightweight} uses a lightweight
-static data-flow analysis and performs multi-value comparisions in the
+Elkarablieh introduced an efficient backtracking
+optimization~\cite{elkarablieh2008efficient} that can undo operations
+done in last execution and proceed from that point in the \emph{RepOk}
+predicate for the next candidate.  This has shown improvements for
+STARC and also for Korat. Siddiqui presented \emph{focused
+  generation}~\cite{siddiqui2009optimizing}, a novel optimization in
+Korat where the structure generation is focussed to some aspect of the
+structure. For example, finding all structures with one data
+assignment or finding all structures with one valid instance of a
+previously tested contained structure. Later he introduced
+Multi-Korat~\cite{siddiqui2012lightweight} uses a lightweight static
+data-flow analysis and performs multi-value comparisions in the
 candidate structure to \emph{forward} predicate executions on
 candidate inputs that are similar. Multi-Korat is centered around
 reducing the number of \emph{RepOk} executions to produce all test
